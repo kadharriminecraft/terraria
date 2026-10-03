@@ -2484,6 +2484,63 @@ function genWorld(){
     }
     dungeonZone = {x0:x0-2, x1:x1+2, top:sTop-2, bot:hellY-12}; }
 
+  /* ---- 10b. UNDERGROUND CABINS (Terraria's signature buried rooms):
+     wood plank box, plank floor, a chair, a table, a torch, and a chest. ---- */
+  let cabins=0;
+  for(let i=0;i<260 && cabins<16;i++){
+    const x = rndi(CX0+30, CX1-30);
+    const y = rndi(ROCK_Y+6, CAVERN_Y+40);
+    if(bandOf(x)==='dungeon') continue;
+    if(!inW(x-5,y-4)||!inW(x+5,y+5)) continue;
+    /* require a mostly-solid pocket to bury into (not inside an open cavern) */
+    let solid=0, tot=0;
+    for(let dx=-5;dx<=5;dx++) for(let dy=-4;dy<=5;dy++){ tot++; if(isSolid(gT(x+dx,y+dy))) solid++; }
+    if(solid/tot < 0.55) continue;
+    const w=rndi(7,10), h=rndi(4,6);
+    /* hollow the room, plank the walls/floor/ceiling */
+    for(let dx=-w;dx<=w;dx++) for(let dy=-h;dy<=h;dy++){ const tx=x+dx, ty=y+dy; if(!inW(tx,ty)) continue;
+      const edge = (dx===-w||dx===w||dy===-h||dy===h);
+      if(edge){ tiles[idx(tx,ty)]=T.PLANK; if(!walls[idx(tx,ty)]) walls[idx(tx,ty)]=T.PLANK; }
+      else { tiles[idx(tx,ty)]=T.AIR; liq[idx(tx,ty)]=0; liqL[idx(tx,ty)]=0; walls[idx(tx,ty)]=T.PLANK; } }
+    /* interior: chair + table (as solid plank nubs) + torch + chest */
+    const fx=x-w+1+Math.floor(rng()*(2*w-2));
+    if(inW(fx,y+h-1)) tiles[idx(fx,y+h-1)]=T.PLANK;      /* chair/table seat */
+    if(inW(fx+1,y+h-1)) tiles[idx(fx+1,y+h-1)]=T.PLANK;
+    if(inW(x, y-h+1)) tiles[idx(x,y-h+1)]=T.TORCH;
+    addChest(x+ (rng()<0.5?-2:2), y+h-1, rng()<0.25?T.CHESTG:T.CHEST, loot(bandOf(x)==='corruption'?'corruption':(y<CAVERN_Y?'underground':'cavern')));
+    cabins++;
+  }
+
+  /* ---- 10c. DESERT PYRAMID (Terraria): a sandstone pyramid buried in the
+     dunes with a hidden treasure chamber and a gold chest inside. ---- */
+  for(let pcount=0;pcount<2;pcount++){
+    const px0 = rndi(1032, 1098); const half = rndi(12,16);
+    let baseY=0; for(let dx=-half;dx<=half;dx++){ const s=SURF[clamp(px0+dx,0,WORLD_W-1)]; if(s>baseY) baseY=s; }
+    for(let dy=0; dy<half; dy++){ const rw=Math.round(half*(1-dy/half));
+      for(let dx=-rw; dx<=rw; dx++){ const tx=px0+dx, ty=baseY-dy; if(inW(tx,ty)) tiles[idx(tx,ty)]=T.SANDST; } }
+    const cy=baseY-1;                       /* hidden chamber near the base */
+    for(let dx=-3;dx<=3;dx++) for(let dy=-3;dy<=0;dy++){ const tx=px0+dx, ty=cy+dy; if(!inW(tx,ty)) continue;
+      const edge=Math.abs(dx)===3||dy===-3; tiles[idx(tx,ty)] = edge?T.SANDST:T.AIR; if(edge) walls[idx(tx,ty)]=T.SANDST; }
+    addChest(px0, cy, T.CHESTG, loot('desert'));
+    if(inW(px0,cy-3)) tiles[idx(px0,cy-3)]=T.TORCH;
+  }
+
+  /* ---- 10d. CORRUPTION CHASMS: vertical ebonstone shafts descending from
+     the surface, exactly the Corruption's signature terrain. ---- */
+  for(let c=0;c<4;c++){
+    let x = rndi(392, 468); let y = SURF[x];
+    const len = rndi(60,110);
+    for(let s=0;s<len;s++){
+      const w = 2 + ((s%18)<9?0:1);
+      for(let dx=-w;dx<=w;dx++){ const tx=x+dx; if(!inW(tx,y)) continue;
+        tiles[idx(tx,y)]=T.AIR; liq[idx(tx,y)]=0; liqL[idx(tx,y)]=0; }
+      if(inW(x-w-1,y)) walls[idx(x-w-1,y)]=T.EBON;   /* ebonstone walls */
+      if(inW(x+w+1,y)) walls[idx(x+w+1,y)]=T.EBON;
+      if(s%12===0) x += rndi(-3,3);
+      y += 1; x = clamp(x, 390, 470);
+    }
+  }
+
   /* ---- 11. decor: flowers, glow shrooms, vines, cacti ---- */
   for(let x=2;x<WORLD_W-2;x++){ const s=SURF[x], t=tiles[idx(x,s)];
     if((t===T.GRASS||t===T.JGRASS) && tiles[idx(x,s-1)]===T.AIR && rng()<0.3) tiles[idx(x,s-1)] = rng()<0.3?T.FLOWER:T.TGRASS; }
