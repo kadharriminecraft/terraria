@@ -635,8 +635,8 @@ def('hellstoneBar',{name:'Hellstone Bar',kind:'material',rar:3,desc:'3 hellstone
 def('diamond',{name:'Diamond',kind:'material',rar:2,desc:'Sparkles deep underground.'});
 def('coin',{name:'Coin',kind:'special',stack:999999,rar:0,desc:'Money.'});
 /* tools: power, spd (hits/sec multiplier) */
-const tiers=[['wood',35,1,'A crude starter tool.','#c8c8c8'],['iron',55,1.25,'Solid iron craftsmanship.','#9696ff'],
-  ['diamond',80,1.55,'Cuts like glass.','#7dff7d'],['hell',110,1.9,'Burning hot!','#ffa54f']];
+const tiers=[['wood',35,1,'A crude starter tool.','#a97953'],['iron',55,1.25,'Solid iron craftsmanship.','#c0c8d4'],
+  ['diamond',80,1.55,'Cuts like glass.','#4ee6e0'],['hell',110,1.9,'Burning hot!','#ff7a2e']];
 tiers.forEach(([pre,pw,sp,desc,col])=>{
   def(pre+'Pick',{name:pre[0].toUpperCase()+pre.slice(1)+' Pickaxe',kind:'tool',tool:{type:'pick',power:pw,spd:sp},dmg:pre==='wood'?4:(pre==='iron'?6:(pre==='diamond'?9:13)),useTime:0.28,rar:pre==='wood'?0:(pre==='iron'?0:(pre==='diamond'?2:3)),desc,col});
   def(pre+'Axe',{name:pre[0].toUpperCase()+pre.slice(1)+' Axe',kind:'tool',tool:{type:'axe',power:pw,spd:sp},dmg:pre==='wood'?5:(pre==='iron'?7:(pre==='diamond'?10:14)),useTime:0.3,rar:pre==='wood'?0:(pre==='iron'?0:(pre==='diamond'?2:3)),desc,col});
@@ -695,6 +695,23 @@ def('healPot',{name:'Healing Potion',kind:'potion',heal:100,useTime:0.3,rar:1,de
 def('manaCrystal',{name:'Mana Crystal',kind:'potion',useTime:0.3,rar:1,desc:'Permanently +20 max mana (max 5).'});
 def('lifeCrystal',{name:'Life Crystal',kind:'potion',useTime:0.3,rar:1,desc:'Permanently +20 max life (max 15).'});
 def('magicMirror',{name:'Magic Mirror',kind:'special',useTime:1,rar:3,desc:'Gaze to return to your spawn point.'});
+/* extra Terraria items referenced by chest loot (melee / magic / accessories) */
+def('trident',{name:'Trident',kind:'melee',dmg:24,useTime:0.32,kb:6.5,rar:2,desc:'A three-pronged spear found in ocean chests.'});
+def('ballOHurt',{name:'Ball O\' Hurt',kind:'melee',dmg:30,useTime:0.45,kb:9,reach:3.6,rar:3,desc:'A spiked flail of corruption.'});
+def('iceBlade',{name:'Ice Blade',kind:'melee',dmg:17,useTime:0.30,kb:5.5,rar:2,desc:'A frozen blade that chills the air.'});
+def('sunfury',{name:'Sunfury',kind:'melee',dmg:40,useTime:0.45,kb:10,reach:3.8,rar:4,fire:1,desc:'A burning flail forged in the Underworld.'});
+def('snowballCannon',{name:'Snowball Cannon',kind:'ranged',dmg:8,useTime:0.20,proj:'snowball',kb:2,rar:1,desc:'Packs a frosty punch. No ammo needed.'});
+def('staffOfRegrowth',{name:'Staff of Regrowth',kind:'magic',dmg:12,useTime:0.30,mana:6,proj:'diamondBolt',kb:3,rar:3,desc:'A verdant staff humming with growth.'});
+def('flamelash',{name:'Flamelash',kind:'magic',dmg:30,useTime:0.35,mana:18,proj:'fireball',kb:5,rar:4,fire:1,desc:'Cracks a whip of pure fire.'});
+def('shadowOrb',{name:'Shadow Orb',kind:'magic',dmg:25,useTime:0.40,mana:12,proj:'skull',kb:4,rar:3,desc:'A orb of corrupted shadow.'});
+def('aglet',{name:'Aglet',kind:'accessory',acc:{speed:1.08},rar:1,desc:'Slightly increases movement speed.'});
+def('ankletOfTheWind',{name:'Anklet of the Wind',kind:'accessory',acc:{speed:1.16},rar:2,desc:'Greatly increases movement speed.'});
+def('bandOfRegen',{name:'Band of Regeneration',kind:'accessory',acc:{regen:1},rar:3,desc:'Slowly regenerates life.'});
+def('shinyRedBalloon',{name:'Shiny Red Balloon',kind:'accessory',acc:{jumpBoost:1},rar:2,desc:'Increases jump height.'});
+def('flipper',{name:'Flipper',kind:'accessory',acc:{swim:1},rar:2,desc:'Swim much faster through water.'});
+def('breathingReed',{name:'Breathing Reed',kind:'accessory',acc:{breath:1},rar:2,desc:'Breathe longer underwater.'});
+def('sandstormInABottle',{name:'Sandstorm in a Bottle',kind:'accessory',acc:{djump:1},rar:3,desc:'Grants a double jump.'});
+def('flyingCarpet',{name:'Flying Carpet',kind:'accessory',acc:{djump:1},rar:3,desc:'Grants a double jump.'});
 /* boss summons */
 def('slimeCrown',{name:'Slime Crown',kind:'bossSummon',boss:'kingSlime',useTime:0.3,rar:1,desc:'Summons King Slime. Anywhere, anytime.'});
 def('suspiciousEye',{name:'Suspicious Eye',kind:'bossSummon',boss:'eye',night:1,useTime:0.3,rar:1,desc:'Summons the Eye of Cthulhu at night.'});
@@ -825,23 +842,23 @@ function crack(g,x0,y0,x1,y1,col){
 }
 /* per-tile palettes: [base, dark, light, rim] - sampled from real Terraria sprites:
    dirt = desaturated gray-brown (#78645a/#a08c78), stone = neutral gray */
-const P_DIRT  = ['#9e8a74','#6e5a48','#bcab93','#503e2e'];
-const P_STONE = ['#6a6a70','#4c4c52','#90909a','#34343a'];
+const P_DIRT  = ['#97684a','#6b452d','#b3805c','#4a2e1c'];
+const P_STONE = ['#7d7d7d','#5a5a5a','#a0a0a0','#3c3c3c'];
 function palFor(t){
   switch(t){
     case T.DIRT: case T.GRASS: return P_DIRT;
     case T.STONE: case T.IRON: case T.DIAM: return P_STONE;
-    case T.PLANK: case T.TRUNK: return ['#a98a58','#7a5c38','#c8ab7a','#54401f'];
-    case T.SAND: return ['#dccb84','#b3a05e','#f2e7b0','#8f7c44'];
-    case T.SANDST: return ['#c9ac6a','#a2824a','#e3d5a5','#7c6136'];
-    case T.SNOW: return ['#eff4f8','#d4dde4','#ffffff','#a9b8c2'];
-    case T.ICE: return ['#a8d8ee','#7cb6d8','#e8f8ff','#5e9cc4'];
-    case T.MUD: case T.JGRASS: return ['#4e4234','#3a3024','#66594a','#281f16'];
-    case T.EBON: case T.EGRASS: return ['#34323f','#252334','#4c4a5e','#191822'];
-    case T.ASH: return ['#5f5a5e','#484448','#777076','#332f33'];
-    case T.HELLST: return ['#5f2f26','#421d17','#78443a','#2e130e'];
-    case T.OBSID: return ['#322848','#221b36','#584a80','#15101f'];
-    case T.DBRICK: return ['#2a3670','#1a224c','#4a58a8','#0e1230'];
+    case T.PLANK: case T.TRUNK: return ['#a0763f','#6b4a24','#c99a63','#4a3018'];
+    case T.SAND: return ['#e6d9a6','#c2b071','#f5eec6','#9a8a54'];
+    case T.SANDST: return ['#c8a874','#9a7c48','#e0cb9c','#755c30'];
+    case T.SNOW: return ['#e8f2fa','#c2d6e6','#ffffff','#9fb4c6'];
+    case T.ICE: return ['#a8d8ee','#6eb0d6','#e8f8ff','#4e90bc'];
+    case T.MUD: case T.JGRASS: return ['#4a3a2e','#2e2318','#5c4a38','#1c140c'];
+    case T.EBON: case T.EGRASS: return ['#3a3450','#252034','#504a6e','#161224'];
+    case T.ASH: return ['#6b666a','#4c484c','#807a80','#34302f'];
+    case T.HELLST: return ['#6b3428','#45200f','#8a4632','#2e140a'];
+    case T.OBSID: return ['#3a2c52','#241a38','#5e4a86','#160e22'];
+    case T.DBRICK: return ['#2a3a80','#182454','#4a5cc0','#0c1230'];
     case T.GBRICK: return ['#e8c83c','#a8821c','#fff08a','#54400e'];
     case T.HELLBRICK: return ['#7a4a42','#52302a','#8e5a50','#241210'];
     default: return P_STONE;
@@ -1200,9 +1217,9 @@ function buildBlockArt(){
   }
 /* grass cap palettes: [main,dark,light,deep] used by edge merging (Terraria greens) */
   ART.grassCap = {
-    [T.GRASS]:  ['#44a434','#2c7a26','#78d84a','#1d5c1d'],
-    [T.JGRASS]: ['#52b828','#2f8418','#8ce04a','#1f660e'],
-    [T.EGRASS]: ['#8b7cc8','#5a4e96','#b3a6e8','#443a6e'],
+    [T.GRASS]:  ['#4bc23a','#2f8a24','#7ee04e','#1f6418'],
+    [T.JGRASS]: ['#57cf2a','#2f9416','#8ee84a','#1f6a0e'],
+    [T.EGRASS]: ['#8f80d0','#5c5098','#b8abec','#463a70'],
     [T.SNOW]:   ['#f4f9fc','#d2e2ee','#ffffff','#b9cdda'],
   };
 }
@@ -1568,6 +1585,29 @@ function buildIcons(){
       case 'wormFood': iconFood(g); break;
       case 'abeemination': iconAbee(g); break;
       case 'cursedSkull': iconSkull(g,'#c8c8d0'); px(g,5,4,2,2,'#40e0c8'); px(g,9,4,2,2,'#40e0c8'); break;
+      case 'trident': outlineOn(g); diag(g,q=>{ px(q,-1,-7,2,14,'#6e4e2e'); }); outlineOff(g);
+        diag(g,q=>{ px(q,-1,-7,2,10,'#b8c0cc'); px(q,-4,-7,1,7,'#b8c0cc'); px(q,2,-7,1,7,'#b8c0cc'); px(q,-1,-8,2,2,'#d8e0ec'); }); break;
+      case 'ballOHurt': outlineOn(g); g.strokeStyle='#5a5a66'; g.lineWidth=1.5; g.beginPath(); g.moveTo(8,1); g.lineTo(8,6); g.stroke(); outlineOff(g);
+        g.fillStyle='#6a6a78'; g.beginPath(); g.arc(8,10,4.5,0,7); g.fill();
+        g.fillStyle='#8a8a98'; for(let i=0;i<6;i++){ const a=i/6*6.283; px(g,8+Math.round(Math.cos(a)*4.5)-1,10+Math.round(Math.sin(a)*4.5)-1,2,2,'#8a8a98'); } break;
+      case 'iceBlade': iconSword(g,'#9fe0f5'); px(g,11,3,3,3,'#e8fbff'); break;
+      case 'sunfury': iconSword(g,'#ff7a2e'); px(g,11,3,3,3,'#ffd97a'); px(g,3,10,3,3,'#ffb040'); break;
+      case 'snowballCannon': iconGun(g,'#8ab0d8'); px(g,13,5,2,3,'#cfe8ff'); px(g,2,2,3,3,'#ffffff'); break;
+      case 'staffOfRegrowth': iconStaff(g,null,'#5ad06a'); px(g,12,3,2,2,'#a8f0a0'); break;
+      case 'flamelash': iconStaff(g,null,'#ff8a2a'); px(g,12,3,2,2,'#ffd97a'); px(g,11,2,1,1,'#fff0a0'); break;
+      case 'shadowOrb': iconBook(g,'#3a2a5a','O'); px(g,6,5,4,4,'#7a5ae0'); px(g,7,6,2,2,'#c0a8ff'); break;
+      case 'aglet': outlineOn(g); px(g,6,4,4,8,'#c8a050'); outlineOff(g); px(g,7,5,1,6,'#ffd97a'); break;
+      case 'ankletOfTheWind': outlineOn(g); g.strokeStyle='#8ad0e0'; g.lineWidth=2; g.beginPath(); g.arc(8,8,5,0.4,6.0); g.stroke(); outlineOff(g); px(g,11,4,2,2,'#e8fbff'); break;
+      case 'bandOfRegen': outlineOn(g); g.strokeStyle='#e0c060'; g.lineWidth=2; g.beginPath(); g.arc(8,9,4.5,0,7); g.stroke(); outlineOff(g); px(g,6,3,4,3,'#ff5050'); px(g,7,4,2,1,'#ff9090'); break;
+      case 'shinyRedBalloon': outlineOn(g); g.fillStyle='#e04040'; g.beginPath(); g.ellipse(8,6,4.5,5.5,0,0,7); g.fill(); outlineOff(g);
+        px(g,6,3,2,2,'#ff9090'); g.strokeStyle='#c8c8d0'; g.lineWidth=1; g.beginPath(); g.moveTo(8,11.5); g.lineTo(7,14); g.stroke(); break;
+      case 'flipper': outlineOn(g); g.fillStyle='#3a7ac0'; g.beginPath(); g.moveTo(4,12); g.quadraticCurveTo(6,3,11,2); g.quadraticCurveTo(9,7,12,12); g.closePath(); g.fill(); outlineOff(g);
+        px(g,5,9,6,1,'#6aa8e0'); break;
+      case 'breathingReed': outlineOn(g); px(g,6,2,2,12,'#4a8a3a'); g.fillStyle='#4a8a3a'; g.beginPath(); g.moveTo(8,4); g.lineTo(12,2); g.lineTo(8,6); g.closePath(); g.fill(); outlineOff(g);
+        px(g,7,2,1,12,'#6ab04a'); break;
+      case 'sandstormInABottle': iconBottleAcc(g); px(g,4,12,2,2,'#d8bc72'); px(g,9,12,2,2,'#d8bc72'); break;
+      case 'flyingCarpet': outlineOn(g); g.fillStyle='#a02040'; g.beginPath(); g.moveTo(2,10); g.lineTo(14,4); g.lineTo(13,7); g.lineTo(3,13); g.closePath(); g.fill(); outlineOff(g);
+        px(g,4,9,3,1,'#e8c040'); break;
       default: if(!drew){ px(g,4,4,8,8,'#888'); }
     }
     I[id]=c; }
@@ -1587,9 +1627,11 @@ function slimeSpr(col,w,h,crown,ninja,kind){
     for(let i=0;i<bh;i++){ const t=(i+1)/bh;
       const hw=Math.max(1,Math.round(bw/2*Math.min(1,Math.pow(t*1.9,0.58))));
       rows.push([cx-hw, cx+hw, y1-bh+i+1, t]); }
-    /* soft outline only on the lower sides (Terraria slimes shade, not outline) */
+    /* soft outline on the sides + a 1px rim across the crown (Terraria slimes
+       read as a clean blobby silhouette) */
     for(const [rx0,rx1,ry,t] of rows){ if(t>0.4){ g.fillStyle=ol;
       g.fillRect(rx0-1,ry,1,1); g.fillRect(rx1,ry,1,1); } }
+    { const top=rows[rows.length-1]; g.fillStyle=ol; g.fillRect(top[0]-1, top[2]-1, (top[1]-top[0])+2, 1); }
     for(const [rx0,rx1,ry] of rows){ g.fillStyle=col; g.fillRect(rx0,ry,rx1-rx0,1); }      /* body */
     for(const [rx0,rx1,ry,t] of rows){ if(t>0.62){ g.fillStyle=dk;                           /* lower shadow, dithered */
       for(let x=rx0;x<rx1;x++) if(DITH(x,ry)) g.fillRect(x,ry,1,1); } }
@@ -1971,37 +2013,62 @@ function buildSprites(){
   S.slimeMinion=slimeSpr('#5a9eff',14,10);
   S.slimeMinionB=slimeSpr('#6a7ae8',18,13);
   S.beeMinionB=beeSpr(12,9,false);
-  /* chest variants */
-  function chestSpr(col,trim,open){ const c=mkCan(18,16),g=cnv(c); px(g,1,4,16,11,col); px(g,1,4,16,3,shade(col,0.15)); px(g,1,13,16,2,shade(col,-0.25));
-    if(open){ px(g,1,0,16,4,shade(col,-0.1)); } else { px(g,1,4,16,1,shade(col,0.3)); }
-    px(g,8,7,2,4,trim); px(g,1,7,16,1,shade(col,-0.35)); return {c}; }
-  S.chestWood={closed:chestSpr('#a97953','#e8c040',false).c, open:chestSpr('#a97953','#e8c040',true).c};
-  S.chestGold={closed:chestSpr('#b09040','#40e0c8',false).c, open:chestSpr('#b09040','#40e0c8',true).c};
-  S.chestHell={closed:chestSpr('#4a3a5a','#ff7a2e',false).c, open:chestSpr('#4a3a5a','#ff7a2e',true).c};
+  /* chest variants: Terraria chest = rounded lid, body, dark outline,
+     metal bands + a round latch. 18x16 so it slightly overhangs its tile. */
+  function chestSpr(col,trim,open){
+    const c=mkCan(18,16), g=cnv(c);
+    const dk=shade(col,-0.35), lt=shade(col,0.22), out=shade(col,-0.5);
+    /* dark outline block behind everything */
+    px(g,0,2,18,14,out);
+    if(open){
+      /* lid flipped up behind the body */
+      px(g,1,0,16,3,shade(col,-0.05)); px(g,1,0,16,1,lt); px(g,1,3,16,1,dk);
+      px(g,1,4,16,10,col); px(g,1,4,16,1,lt); px(g,1,13,16,1,dk);
+      px(g,1,8,16,1,dk);
+    } else {
+      /* closed: domed lid + body */
+      px(g,1,3,16,4,shade(col,0.05)); px(g,1,3,16,1,lt);       // lid
+      px(g,1,2,16,1,out); px(g,2,2,14,1,shade(col,0.05));
+      px(g,1,7,16,7,col); px(g,1,7,16,1,dk); px(g,1,13,16,1,shade(col,-0.3));
+      px(g,2,3,1,1,lt); px(g,15,3,1,1,dk);
+    }
+    /* vertical metal bands + latch */
+    px(g,3,2,2,13,trim); px(g,13,2,2,13,trim);
+    px(g,3,2,1,13,shade(trim,0.25)); px(g,13,2,1,13,shade(trim,0.25));
+    px(g,7,7,4,4,trim); px(g,8,8,2,2,shade(trim,-0.3)); px(g,8,8,1,1,'#fff8d0');
+    return {c};
+  }
+  S.chestWood={closed:chestSpr('#a97953','#c8a24a',false).c, open:chestSpr('#a97953','#c8a24a',true).c};
+  S.chestGold={closed:chestSpr('#c8a63c','#7ae0d0',false).c, open:chestSpr('#c8a63c','#7ae0d0',true).c};
+  S.chestHell={closed:chestSpr('#5a3a4a','#ff9a3e',false).c, open:chestSpr('#5a3a4a','#ff9a3e',true).c};
 }
 /* ---------- player parts (Terraria proportions: compact head, flat face) ---------- */
 function buildPlayerArt(){
   const P=ART.parts;
-  /* head 14x12: hair cap + small flat face (~10px) so the head reads ~1/4 of
-     body height like a real Terraria character */
-  const head=mkCan(14,12), hg=cnv(head);
-  px(hg,3,2,9,10,'#f8b888');                          // face
-  px(hg,3,2,9,1,'#ffd0a8');                          // forehead light
-  px(hg,3,0,9,4,'#7a4a26');                          // hair cap
-  px(hg,4,0,8,1,'#96602f');                          // hair shine
-  px(hg,3,3,1,3,'#7a4a26');                          // jagged fringe teeth
-  px(hg,6,4,1,1,'#7a4a26'); px(hg,9,3,1,2,'#7a4a26'); px(hg,11,4,1,2,'#6b3f20');
-  px(hg,3,5,2,5,'#7a4a26'); px(hg,10,5,2,4,'#6b3f20');  // side hair
-  px(hg,2,2,1,3,'#7a4a26');                          // fringe flick
-  px(hg,12,3,1,2,'#7a4a26');
-  px(hg,3,4,9,1,'#5c381c');                          // hair outline under fringe
-  px(hg,4,6,3,2,'#fff'); px(hg,8,6,3,2,'#fff');      // big eye whites (centered)
-  px(hg,5,6,2,2,'#2a4a8a'); px(hg,9,6,2,2,'#2a4a8a'); // wide pupils
-  px(hg,5,6,1,1,'#7ab0e8'); px(hg,9,6,1,1,'#7ab0e8'); // eye glints
-  px(hg,4,5,3,1,'#5c381c'); px(hg,8,5,3,1,'#5c381c'); // brows
-  px(hg,7,8,1,1,'#e0a078');                          // tiny nose
-  px(hg,6,10,4,1,'#c07858');                          // mouth
-  px(hg,3,11,9,1,'#d89868');                          // chin shadow
+  /* head 14x13: a big rounded head with a full hair helmet and a small flat
+     face - the classic Terraria player proportion (head ~ 1/4 of height). */
+  const head=mkCan(14,13), hg=cnv(head);
+  const SKIN='#ffb98a', SKINL='#ffd2ab', SKIND='#d8956a', HAIR='#6b3f20', HAIRL='#8a5a30', HAIRD='#4a2a12';
+  /* hair helmet: cap + sides + back, drawn first so the face sits inside it */
+  px(hg,2,0,10,3,HAIR); px(hg,1,1,12,3,HAIR);
+  px(hg,2,1,8,1,HAIRL);                              // crown shine
+  px(hg,1,3,2,8,HAIR); px(hg,11,3,2,7,HAIRD);        // side hair
+  px(hg,2,3,10,1,HAIRD);                             // hairline shadow
+  /* face */
+  px(hg,3,3,8,9,SKIN);
+  px(hg,3,3,8,1,SKINL);                              // forehead light
+  px(hg,11,4,1,8,SKIND);                             // right-side shading
+  px(hg,3,12,8,1,SKIND);                             // chin shadow
+  /* jagged fringe teeth over the forehead */
+  px(hg,3,3,1,2,HAIR); px(hg,6,3,1,1,HAIR); px(hg,8,3,1,2,HAIR); px(hg,10,3,1,1,HAIR);
+  /* eyes: white 2px + blue pupil, with a dark lash line above */
+  px(hg,4,6,3,3,'#ffffff'); px(hg,8,6,3,3,'#ffffff');
+  px(hg,5,6,2,3,'#2a4a8a'); px(hg,9,6,2,3,'#2a4a8a');
+  px(hg,5,6,1,1,'#7ab0e8'); px(hg,9,6,1,1,'#7ab0e8');
+  px(hg,4,5,3,1,HAIRD); px(hg,8,5,3,1,HAIRD);        // lashes / brows
+  /* nose + mouth */
+  px(hg,7,9,1,2,SKIND);
+  px(hg,6,11,3,1,'#c8785a');                         // small smile
   P.head=head;
   /* torso 10x14: vivid blue shirt with collar, seam, belt */
   const torso=mkCan(10,14), tg=cnv(torso);
@@ -2053,29 +2120,49 @@ function buildFx(){
     ART.fx.crack.push(c); }
 }
 function buildArt(){ artRng = mulberry32(SEED+777); buildBlockArt(); buildTrees(); buildParallax(); buildIcons(); buildSprites(); buildPlayerArt(); buildHud(); buildFx(); }
-/* ================= WORLD GENERATION v4 =================
-   1280x512 world (double-size). 120-tile oceans with real 30-wide dry
-   palm beaches sloping into deep basins, smooth cosine surface, complex
-   CA + worm-tunnel caves, floating sky islands (bone dry), and a true
-   Underworld with big Terraria-style multi-storey hell houses: platform
-   floors, 3-tall doorways and CHESTS INSIDE. Dungeon walls are now
-   1-block thin - Terraria proportions everywhere. */
-let SURF, trees, chests, pots, lifePickups, spawnPt, dungeonZone, islands = [], hellY = 416;
-const SEA = 100;                   /* ocean surface row */
-const OW_L = 120, OW_R = 120;      /* ocean widths (tiles) - big Terraria oceans */
+/* ================= WORLD GENERATION (Terraria-accurate) =================
+   1280x512 world built the way Terraria builds a small world:
+   - a rolling surface with soft hills and a flat spawn plateau
+   - two wide oceans whose dry palm beaches slope into deep basins
+   - a layered underground: soil -> stone (underground) -> cavern, with the
+     classic circular cave systems plus surface cave mouths
+   - distinct surface biomes (snow, forest, corruption, jungle, desert) that
+     also reach down into the rock
+   - floating sky islands with a small shrine + chest
+   - a brick Dungeon in the far east with rooms, shelves and gold chests
+   - the Underworld: a vast lava-lit open cavern with hellstone veins and
+     ruined hell houses holding chests
+   Chests are hand-placed the Terraria way: on solid floors inside caves /
+   houses / shrines, never floating, each with meaningful loot. */
+let SURF, trees, chests, pots, lifePickups, spawnPt, dungeonZone, islands = [], hellY = 430;
+const SEA = 104;                    /* ocean surface row */
+const OW_L = 110, OW_R = 110;       /* ocean widths (tiles) */
 const isOceanCol = x => (x < OW_L) || (x >= WORLD_W - OW_R);
-/* biome bands: ocean | snow | forest | corrupt | forest | jungle | desert | forest | dungeon | ocean */
-const BIO = { oceanL:[0,120], snow:[120,290], forest1:[290,370], corrupt:[370,470], forest2:[470,830],
-  jungle:[830,1010], desert:[1010,1120], forest3:[1120,1140], dungeon:[1140,1160], oceanR:[1160,1280] };
+const CAVERN_Y = 252;               /* absolute row where the cavern layer begins */
+const ROCK_Y   = 150;               /* first row that is mostly stone */
+/* biome bands: ocean | snow | forest | corruption | forest | jungle | desert | forest | dungeon | ocean */
+const BIO = { oceanL:[0,110], snow:[110,300], forest1:[300,380], corrupt:[380,480], forest2:[480,830],
+  jungle:[830,1010], desert:[1010,1120], forest3:[1120,1140], dungeon:[1140,1160], oceanR:[1170,1280] };
+function bandOf(x){
+  if(x < OW_L) return 'ocean';
+  if(x < 300) return 'snow';
+  if(x < 380) return 'forest';
+  if(x < 480) return 'corruption';
+  if(x < 830) return 'forest';
+  if(x < 1010) return 'jungle';
+  if(x < 1120) return 'desert';
+  if(x < 1140) return 'forest';
+  if(x < 1160) return 'dungeon';
+  if(x < WORLD_W - OW_R) return 'forest';
+  return 'ocean';
+}
 function biomeAt(x,y){
-  if(y >= hellY+8) return 'hell';
-  if(x>=1140 && x<=1160 && y > SURF[clamp(x,0,WORLD_W-1)]-24) return 'dungeon';
-  if(isOceanCol(x)) return 'ocean';
-  if(y > SURF[clamp(x,0,WORLD_W-1)] + 7) return 'underground';
-  if(x < 290) return 'snow'; if(x < 370) return 'forest';
-  if(x < 470) return 'corruption'; if(x < 830) return 'forest';
-  if(x < 1010) return 'jungle'; if(x < 1120) return 'desert';
-  return 'forest';
+  const sx = clamp(x,0,WORLD_W-1);
+  if(y >= hellY) return 'hell';
+  if(x>=1136 && x<=1164 && y > SURF[sx]-30) return 'dungeon';
+  if(x<OW_L || x>=WORLD_W-OW_R) return 'ocean';
+  if(y > SURF[sx]+6) return 'underground';
+  return bandOf(x);
 }
 function carve(cx,cy,rx,ry){ for(let y=Math.max(1,cy-ry); y<=Math.min(WORLD_H-2,cy+ry); y++)
   for(let x=Math.max(1,cx-rx); x<=Math.min(WORLD_W-2,cx+rx); x++)
@@ -2083,412 +2170,438 @@ function carve(cx,cy,rx,ry){ for(let y=Math.max(1,cy-ry); y<=Math.min(WORLD_H-2,
 function setCol(x,y0,y1,t){ for(let y=y0;y<=y1;y++) if(inW(x,y)) tiles[idx(x,y)]=t; }
 function surfaceTileFor(x){
   if(isOceanCol(x)) return T.SAND;
-  const b = x<290?'snow': x<470?(x<370?'forest':'corruption'): x<830?'forest': x<1010?'jungle': x<1120?'desert': 'forest';
-  if(b==='snow') return T.SNOW; if(b==='corrupt') return T.EGRASS; if(b==='jungle') return T.JGRASS;
-  if(b==='desert') return T.SAND; return T.GRASS;
+  const b = bandOf(x);
+  if(b==='snow') return T.SNOW;
+  if(b==='corruption') return T.EGRASS;
+  if(b==='jungle') return T.JGRASS;
+  if(b==='desert') return T.SAND;
+  return T.GRASS;
 }
 /* caves may not breach the ocean seal band */
-function caveOK(x,y){ return !isOceanCol(x) || y > SURF[x]+9; }
-/* safe x range for big carved features (never under the oceans) */
-const CX0 = 130, CX1 = 1150;
+function caveOK(x,y){ return !isOceanCol(x) || y > SURF[x]+10; }
+const CX0 = 118, CX1 = 1162;        /* safe x range for big carved features */
+
+/* ---------- loot tables (kind = where the chest is) ---------- */
+const LOOT_UNIQUE = {
+  surface:   ['magicMirror','hermesBoots','cloudBottle','luckyHorseshoe','feralClaws','aglet','shinyRedBalloon','bandOfRegen'],
+  underground:['magicMirror','hermesBoots','cloudBottle','luckyHorseshoe','feralClaws','aglet','shinyRedBalloon','bandOfRegen'],
+  cavern:    ['magicMirror','hermesBoots','feralClaws','bandOfRegen','shinyRedBalloon','diamondStaff'],
+  ice:       ['iceBlade','magicMirror','hermesBoots','snowballCannon','bandOfRegen'],
+  jungle:    ['staffOfRegrowth','feralClaws','hermesBoots','honeyComb','ankletOfTheWind'],
+  desert:    ['magicMirror','hermesBoots','bandOfRegen','sandstormInABottle'],
+  corruption:['shadowOrb','wormScarf','musket','ballOHurt'],
+  dungeon:   ['muramasa','handgun','waterBolt','aquaScepter','blueMoon','cobaltShield','boneSword'],
+  underworld:['fieryGreatsword','sunfury','flamelash','shadowfang'],
+  sky:       ['luckyHorseshoe','cloudBottle','hermesBoots','feralClaws','honeyComb','shinyRedBalloon'],
+  ocean:     ['trident','breathingReed','flipper','hermesBoots'],
+  pyramid:   ['sandstormInABottle','flyingCarpet','magicMirror'],
+};
+const LOOT_COIN = { surface:[150,700], underground:[400,1800], cavern:[900,3200], ice:[700,2400],
+  jungle:[800,2800], desert:[600,2200], corruption:[800,2600], dungeon:[2500,6000], underworld:[3000,7000],
+  sky:[600,2000], ocean:[800,2600], pyramid:[1500,4500] };
 
 function genWorld(){
   tiles = new Uint8Array(WORLD_W*WORLD_H); liq = new Uint8Array(WORLD_W*WORLD_H); liqL = new Uint8Array(WORLD_W*WORLD_H); walls = new Uint8Array(WORLD_W*WORLD_H);
   trees=[]; chests=new Map(); pots=[]; lifePickups=[]; islands=[]; rng = mulberry32(SEED);
 
-  /* ---- chest/loot helpers (needed early: hell houses use them) ---- */
-  function findFloor(y0,y1,x0,x1){ for(let t=0;t<600;t++){ const x=rndi(x0,x1), y=rndi(y0,y1);
-      if(!inW(x,y) || !inW(x,y+1)) continue;
+  /* ---- chest / loot helpers (defined early: hell houses use them) ---- */
+  function findFloor(y0,y1,x0,x1,airH){ airH = airH||2;
+    for(let t=0;t<900;t++){ const x=rndi(x0,x1), y=rndi(y0,y1);
+      if(!inW(x,y) || !inW(x,y+1) || y<1) continue;
       const below = tiles[idx(x,y+1)];
-      if(tiles[idx(x,y)]===T.AIR && tiles[idx(x,y-1)]===T.AIR && !liq[idx(x,y)]
-        && (isSolid(below)||below===T.PLAT) && below!==T.POT) return {x,y}; } return null; }
-  function addChest(x,y,type,items){ if(!inW(x,y)) return; tiles[idx(x,y)]=type; chests.set(idx(x,y), {x,y,items,type,open:false}); }
-  function lootGeneric(deep){ const L=[]; const n=rndi(3,5);
-    for(let i=0;i<n;i++){ const r=rng();
-      if(r<0.25) L.push({id:'coin', n:rndi(200,deep?2500:900)});
-      else if(r<0.45) L.push({id:'torch', n:rndi(6,18)});
-      else if(r<0.62) L.push({id:'lesserHeal', n:rndi(1,3)});
-      else if(r<0.75) L.push({id:'arrowWood', n:rndi(15,40)});
-      else if(r<0.85) L.push({id:'ironOre', n:rndi(4,12)});
-      else if(r<0.93 && deep) L.push({id:'diamond', n:rndi(1,3)});
-      else L.push({id:'gel', n:rndi(3,8)}); }
-    return L; }
-  function lootHell(){ const L=[{id:'coin',n:rndi(2000,5000)},{id:'hellstoneBar',n:rndi(2,5)},{id:'obsidian',n:rndi(6,14)},{id:'lesserHeal',n:rndi(2,4)}];
-    if(rng()<0.35) L.push({id:'platform',n:rndi(20,40)}); return L; }
+      let okAir=true; for(let h=0;h<airH;h++) if(tiles[idx(x,y-h)]!==T.AIR || liq[idx(x,y-h)]) { okAir=false; break; }
+      if(okAir && (isSolid(below)||below===T.PLAT) && below!==T.POT && !liq[idx(x,y+1)]) return {x,y}; }
+    return null; }
+  function addChest(x,y,type,items){ if(!inW(x,y)) return false;
+    if(tiles[idx(x,y)]!==T.AIR && tiles[idx(x,y)]!==T.PLAT) return false;
+    if(liq[idx(x,y)]) return false;
+    const below=tiles[idx(x,y+1)];
+    if(!(isSolid(below)||below===T.PLAT)) return false;
+    if(chests.has(idx(x,y))) return false;
+    tiles[idx(x,y)]=type; chests.set(idx(x,y), {x,y,items,type,open:false}); return true; }
+  function loot(kind){
+    const L=[]; const coin=LOOT_COIN[kind]||[200,1200];
+    L.push({id:'coin', n:rndi(coin[0],coin[1])});
+    if(rng()<0.55) L.push({id:'torch', n:rndi(5,16)});
+    if(rng()<0.50) L.push({id: rng()<0.6?'lesserHeal':'healPot', n:rndi(1,3)});
+    if(rng()<0.40) L.push({id:'arrowWood', n:rndi(15,45)});
+    if(rng()<0.30) L.push({id: rng()<0.5?'ironOre':'ironBar', n:rndi(4,14)});
+    const primary=LOOT_UNIQUE[kind]||LOOT_UNIQUE.surface;
+    L.push({id: primary[rndi(0,primary.length-1)], n:1});
+    if(rng()<0.45){ const extra=primary[rndi(0,primary.length-1)]; L.push({id:extra, n:1}); }
+    if(kind==='dungeon' && rng()<0.6) L.push({id:'bone', n:rndi(4,12)});
+    if(kind==='underworld' && rng()<0.4) L.push({id:'hellstone', n:rndi(6,16)});
+    if(kind==='cavern' && rng()<0.35) L.push({id:'diamond', n:rndi(1,3)});
+    return L;
+  }
 
-  /* ---- 1. smooth surface heightmap (cosine interpolation, gentle hills) ---- */
+  /* ---- 1. rolling surface heightmap (value-noise hills + biome shaping) ---- */
+  const vnoise1 = (x,seed,freq)=>{ const fx=x*freq, i=Math.floor(fx), f=fx-i;
+    const a=hash2(i,seed), b=hash2(i+1,seed); const t=(1-Math.cos(f*Math.PI))/2; return a+(b-a)*t; };
   SURF = new Array(WORLD_W);
-  const step=24; const ctrl=[];
-  for(let x=0;x<=WORLD_W;x+=step){
-    let h=98+rnd(-4.5,4.5);
-    if(x>=120 && x<290) h=97.5+rnd(-4,4);         /* snow: soft rolling */
-    if(x>=830 && x<1010) h=99.5+rnd(-3.5,3.5);    /* jungle */
-    if(x>=1010 && x<1120) h=99+rnd(-3,3);        /* desert: flattest */
-    ctrl.push(h);
-  }
   for(let x=0;x<WORLD_W;x++){
-    const i=Math.min(Math.floor(x/step), ctrl.length-2);
-    const f=(x-i*step)/step;
-    const tt=(1-Math.cos(f*Math.PI))/2;          /* smooth cosine blend, no per-tile jitter */
-    SURF[x]=clamp(Math.round(lerp(ctrl[i],ctrl[i+1],tt)),78,120);
+    let h = 100
+      + (vnoise1(x,11,1/96)-0.5)*30
+      + (vnoise1(x,23,1/38)-0.5)*13
+      + (vnoise1(x,37,1/14)-0.5)*5;
+    const b=bandOf(x);
+    if(b==='desert') h = 100 + (vnoise1(x,41,1/70)-0.5)*10;      /* flat dunes */
+    else if(b==='jungle') h = 101 + (vnoise1(x,43,1/60)-0.5)*16;
+    else if(b==='corruption') h = 100 + (vnoise1(x,47,1/55)-0.5)*20;
+    SURF[x]=clamp(Math.round(h),84,120);
   }
 
-  /* ---- 2. real ocean profiles: wide DRY beach -> shoreline -> deep basin ---- */
-  function shapeOcean(x0, w, leftSide){
-    const inner = SURF[leftSide ? x0+w : x0-1];   /* adjacent land height */
-    const beach=30, shore=12;
+  /* ---- 2. ocean profiles: dry beach -> shoreline -> deep basin ---- */
+  function shapeOcean(x0,w,leftSide){
+    const adj = leftSide ? SURF[x0+w] : SURF[x0-1];
+    const beach=34, shore=10;
     for(let k=0;k<w;k++){
-      const x = leftSide ? x0+k : x0+w-1-k;       /* k=0 at the world edge */
+      const x = leftSide ? x0+k : x0+w-1-k;
       let h;
-      if(k >= w-beach){ const v=(w-k)/beach; h = lerp(inner, SEA-2, (1-Math.cos(v*Math.PI))/2); }        /* dry palm beach */
-      else if(k >= w-beach-shore){ const v=(w-beach-k)/shore; h = lerp(SEA-2, SEA+4, v); }               /* shoreline slope */
-      else { const v=(w-beach-shore-k)/(w-beach-shore); h = SEA+4 + 30*Math.pow(v,1.4); }                 /* deep basin */
-      SURF[x]=clamp(Math.round(h), SEA-10, SEA+34);
+      if(k >= w-beach){ const v=(w-k)/beach; h=lerp(adj, SEA-2, (1-Math.cos(v*Math.PI))/2); }
+      else if(k >= w-beach-shore){ const v=(w-beach-k)/shore; h=lerp(SEA-2, SEA+5, v); }
+      else { const v=(w-beach-shore-k)/(w-beach-shore); h=SEA+5 + 34*Math.pow(v,1.35); }
+      SURF[x]=clamp(Math.round(h), SEA-8, SEA+40);
     }
   }
   shapeOcean(0, OW_L, true);
   shapeOcean(WORLD_W-OW_R, OW_R, false);
 
-  /* ---- 3. fill columns (biome soils + ocean sand) ---- */
+  /* ---- 3. fill columns (layered soils: dirt -> stone, per biome) ---- */
   for(let x=0;x<WORLD_W;x++){
-    const s=SURF[x];
-    const ocean = isOceanCol(x);
-    const b = ocean?'ocean': x<290?'snow': x<370?'forest': x<470?'corruption': x<830?'forest': x<1010?'jungle': x<1120?'desert': 'forest';
-    const soilDepth = s + (b==='desert'? 34 : b==='snow'? 20 : 24);
+    const s=SURF[x], ocean=isOceanCol(x), b=bandOf(x);
+    const dirtDepth = ocean? 10 : b==='desert'? 30 : b==='snow'? 20 : b==='jungle'? 26 : 22;
+    const stoneTop = s + dirtDepth;
     for(let y=s;y<WORLD_H;y++){
       let t;
-      if(y >= hellY){ t = T.ASH; }
-      else if(y < soilDepth){
-        if(ocean) t = (y>s+9)?T.STONE:T.SAND;
-        else if(b==='snow') t = (y>s+3 && rng()<0.35)?T.ICE:T.SNOW;
-        else if(b==='desert') t = (y>s+20)?T.SANDST:T.SAND;
+      if(y >= hellY) t = T.ASH;
+      else if(y < stoneTop){
+        if(ocean) t = (y>s+8)?T.STONE:T.SAND;
+        else if(b==='snow') t = (y>s+4 && rng()<0.30)?T.ICE:T.SNOW;
+        else if(b==='desert') t = (y>s+18)?T.SANDST:T.SAND;
         else if(b==='jungle') t = T.MUD;
         else if(b==='corruption') t = T.EBON;
         else t = T.DIRT;
       } else t = T.STONE;
       tiles[idx(x,y)] = t;
-      /* walls */
       if(y > s){ let w;
         if(y>=hellY) w = T.ASH;
         else if(ocean) w = (y>s+10)?T.STONE:T.SAND;
         else if(b==='corruption') w = T.EBON;
-        else if(y < soilDepth+4) w = T.DIRT;
+        else if(y < stoneTop+4) w = T.DIRT;
         else w = T.STONE;
         walls[idx(x,y)] = w; }
     }
     tiles[idx(x,s)] = surfaceTileFor(x);
   }
-  /* sandy beach strips reach into the neighbouring biome so the shore
-     reads as one continuous beach (not snow/forest slamming into water) */
-  for(const [bx0,bx1] of [[OW_L,OW_L+7],[WORLD_W-OW_R-7,WORLD_W-OW_R-1]]){
+  /* sandy beach strips reach into the neighbouring biome so the shore reads
+     as one continuous beach (not snow/forest slamming into water) */
+  for(const [bx0,bx1] of [[OW_L,OW_L+8],[WORLD_W-OW_R-8,WORLD_W-OW_R-1]]){
     for(let x=bx0;x<=bx1;x++){ const s=SURF[x];
       for(let y=s;y<s+5 && y<WORLD_H;y++){ const t=tiles[idx(x,y)];
         if(t===T.SNOW||t===T.ICE||t===T.GRASS||t===T.DIRT||t===T.EBON||t===T.EGRASS||t===T.MUD) tiles[idx(x,y)]=T.SAND; }
       if(SURF[x] < SEA+6) tiles[idx(x,s)]=T.SAND; } }
-  /* corruption / jungle underground veins */
-  for(let x=372;x<466;x++) for(let y=SURF[x]+12; y<hellY; y++) if(rng()<0.35 && tiles[idx(x,y)]===T.STONE) tiles[idx(x,y)]=T.EBON;
-  for(let x=833;x<1006;x++) for(let y=SURF[x]+16; y<240; y++) if(rng()<0.3 && tiles[idx(x,y)]===T.STONE) tiles[idx(x,y)]=T.MUD;
+  /* corruption / jungle bleed into the rock below their surface bands */
+  for(let x=382;x<478;x++) for(let y=SURF[x]+10; y<hellY; y++)
+    if(tiles[idx(x,y)]===T.STONE && rng()<(y<CAVERN_Y?0.30:0.18)) tiles[idx(x,y)]=T.EBON;
+  for(let x=832;x<1008;x++) for(let y=SURF[x]+14; y<CAVERN_Y+40; y++)
+    if(tiles[idx(x,y)]===T.STONE && rng()<0.3) tiles[idx(x,y)]=T.MUD;
 
-  /* ---- 4. complex cave systems: CA blobs + worm tunnels + caverns ---- */
+  /* ---- 4. cave systems: CA blobs (underground) + big caverns (cavern) ---- */
   const open = new Uint8Array(WORLD_W*WORLD_H);
-  for(let y=160;y<392;y++) for(let x=3;x<WORLD_W-3;x++){
-    if(tiles[idx(x,y)]!==T.AIR && caveOK(x,y)){ const dens = y<240?0.37:0.45; if(rng()<dens) open[idx(x,y)]=1; }
+  for(let y=Math.max(120, ROCK_Y-20); y<hellY-6; y++){
+    for(let x=3;x<WORLD_W-3;x++){
+      if(tiles[idx(x,y)]===T.AIR || !caveOK(x,y)) continue;
+      const dens = y < 200 ? 0.30 : (y < CAVERN_Y ? 0.37 : 0.45);
+      if(rng()<dens) open[idx(x,y)]=1;
+    }
   }
-  for(let it=0;it<5;it++){ const cp=open.slice();
-    for(let y=160;y<392;y++) for(let x=3;x<WORLD_W-3;x++){ let n=0;
+  for(let it=0;it<4;it++){ const cp=open.slice();
+    for(let y=Math.max(120, ROCK_Y-20); y<hellY-6; y++) for(let x=3;x<WORLD_W-3;x++){ let n=0;
       for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){ if(!dx&&!dy)continue; n += cp[idx(x+dx,y+dy)]; }
       open[idx(x,y)] = (n>=5)?1:(n<=2?0:cp[idx(x,y)]); } }
-  for(let y=160;y<392;y++) for(let x=3;x<WORLD_W-3;x++) if(open[idx(x,y)]) tiles[idx(x,y)]=T.AIR;
-  /* worm tunnels: long meanders with occasional chambers */
-  for(let i=0;i<34;i++){
-    let x=rndi(CX0+20,CX1-20), y=rndi(170,250), dir=rng()<0.5?-1:1;
-    const len=rndi(90,190), w=rndi(1,2)+(rng()<0.3?1:0);
+  for(let y=Math.max(120, ROCK_Y-20); y<hellY-6; y++) for(let x=3;x<WORLD_W-3;x++) if(open[idx(x,y)]) tiles[idx(x,y)]=T.AIR;
+  /* meandering worm tunnels through the whole underground */
+  for(let i=0;i<42;i++){
+    let x=rndi(CX0+20,CX1-20), y=rndi(150,300), dir=rng()<0.5?-1:1;
+    const len=rndi(90,210), w=rndi(1,2)+(rng()<0.3?1:0);
     for(let s=0;s<len;s++){
       carve(x,y,w+1,w);
       if(rng()<0.05) carve(x,y,w+3,w+1);
       x+=dir; if(rng()<0.22) dir*=-1;
       if(rng()<0.55) y += (rng()<0.5?-1:1);
-      x=clamp(x,CX0,CX1); y=clamp(y,166,390);
+      x=clamp(x,CX0,CX1); y=clamp(y,150,hellY-8);
     }
   }
-  /* big caverns */
-  for(let i=0;i<34;i++) carve(rndi(CX0+10,CX1-10), rndi(195,385), rndi(7,15), rndi(5,9));
-  /* surface cave entrances */
-  for(let i=0;i<18;i++){ let x = rndi(CX0+10, CX1-10), y = SURF[x]+1, dir = rng()<0.5?-1:1;
-    if(biomeAt(x,SURF[x])==='dungeon') continue;
-    for(let s=0;s<rndi(30,64);s++){ carve(x,y,2,3); x+=dir; if(rng()<0.4) dir*= (rng()<0.75?-1:1);
-      y += (rng()<0.65?1:0); y=clamp(y, SURF[clamp(x,0,WORLD_W-1)], 385); x=clamp(x,CX0,CX1); } }
+  /* big rounded caverns in the cavern layer */
+  for(let i=0;i<52;i++) carve(rndi(CX0+10,CX1-10), rndi(CAVERN_Y+4,hellY-14), rndi(7,16), rndi(5,10));
+  /* surface cave mouths that lead down into the system */
+  for(let i=0;i<20;i++){ let x = rndi(CX0+10, CX1-10), y = SURF[x]+1, dir = rng()<0.5?-1:1;
+    if(bandOf(x)==='dungeon') continue;
+    for(let s=0;s<rndi(34,72);s++){ carve(x,y,2,3); x+=dir; if(rng()<0.4) dir*= (rng()<0.75?-1:1);
+      y += (rng()<0.62?1:0); y=clamp(y, SURF[clamp(x,0,WORLD_W-1)], hellY-10); x=clamp(x,CX0,CX1); } }
 
-  /* ---- 5. SKY ISLANDS (Terraria-style floating paradises, bone dry) ---- */
+  /* ---- 5. SKY ISLANDS (floating dirt/stone with a small shrine) ---- */
   genSkyIslands();
 
-  /* ---- 6. THE UNDERWORLD: vast open cavern (WoF bridge room), jagged ash
-     ceiling, ash + hellstone floor drowned in a lava sea, and big
-     multi-storey hell houses with PLATFORM floors + chests inside. ---- */
+  /* ---- 6. THE UNDERWORLD: vast lava-lit cavern, ash ceiling/floor, veins,
+     and multi-storey hell houses with platform floors + chests. ---- */
   {
-    const LSEA = WORLD_H - 20;                    /* lava sea surface */
+    const LSEA = WORLD_H - 24;                    /* lava sea surface */
     const ceil = new Array(WORLD_W), flr = new Array(WORLD_W);
     for(let x=0;x<WORLD_W;x++){
-      ceil[x] = hellY + 5 + Math.round(3.5*Math.sin(x*0.045) + 2.5*Math.sin(x*0.11+2) + hash2(x,911)*3);
-      flr[x]  = LSEA + Math.round(5*Math.sin(x*0.043+1.3) + 3*Math.sin(x*0.1) + hash2(x,313)*2 - 1);
+      ceil[x] = hellY + 4 + Math.round(3.5*Math.sin(x*0.045) + 2.5*Math.sin(x*0.11+2) + hash2(x,911)*3);
+      flr[x]  = LSEA + 2 + Math.round(hash2(x,313)*5);   /* ash floor below the lava line */
     }
     const smooth=(a)=>{ for(let p=0;p<3;p++) for(let x=1;x<WORLD_W-1;x++) a[x]=Math.round((a[x-1]+a[x]*2+a[x+1])/4); };
     smooth(ceil); smooth(flr);
     for(let x=0;x<WORLD_W;x++){
       const cE = clamp(ceil[x], hellY+3, hellY+16);
-      const fT = clamp(flr[x], LSEA-8, LSEA+10);
+      const fT = clamp(flr[x], LSEA+2, WORLD_H-2);
       for(let y=hellY; y<WORLD_H; y++){ const i=idx(x,y);
         tiles[i] = (y < cE || y >= fT) ? T.ASH : T.AIR;
         walls[i] = T.ASH; }
-      /* lava sea fills every dip below the shoreline */
+      /* lava sea: fill every open tile from the lava line down to the floor */
       for(let y=LSEA; y<WORLD_H; y++){ const i=idx(x,y);
         if(tiles[i]===T.AIR){ liq[i]=2; liqL[i]=LMAX; } }
+      /* break the ash floor into pillars so lava pools between them (Terraria) */
+      for(let y=fT; y<WORLD_H; y++){ const i=idx(x,y);
+        if(hash2(x,y)<0.22){ tiles[i]=T.AIR; liq[i]=2; liqL[i]=LMAX; } }
     }
-    /* short stalactites + stalagmites (sparse: the middle stays wide open) */
+    /* stalactites + stalagmites (sparse: the middle stays wide open) */
     for(let x=4;x<WORLD_W-4;x++){
       if(hash2(x,77)<0.15){ const d=2+Math.floor(hash2(x,78)*4);
         for(let k=0;k<d;k++){ const y=clamp(ceil[x],hellY+3,hellY+16)+k; if(y<WORLD_H && tiles[idx(x,y)]===T.AIR) tiles[idx(x,y)]=T.ASH; } }
       if(hash2(x,79)<0.13){ const d=2+Math.floor(hash2(x,80)*3);
-        for(let k=0;k<d;k++){ const y=clamp(flr[x],LSEA-8,LSEA+10)-1-k; if(y>hellY && tiles[idx(x,y)]===T.AIR) tiles[idx(x,y)]=T.ASH; } }
+        for(let k=0;k<d;k++){ const y=clamp(flr[x],LSEA+2,WORLD_H-2)-1-k; if(y>hellY && tiles[idx(x,y)]===T.AIR) tiles[idx(x,y)]=T.ASH; } }
     }
-    /* hellstone veins: packed into the ceiling + the floor ash */
-    for(let v=0; v<380; v++){
-      let x=rndi(4,WORLD_W-4), y = rng()<0.45 ? rndi(hellY, hellY+15) : rndi(LSEA-11, WORLD_H-2);
-      const n=rndi(4,11);
+    /* hellstone veins packed into the ceiling + floor ash */
+    for(let v=0; v<430; v++){
+      let x=rndi(4,WORLD_W-4), y = rng()<0.45 ? rndi(hellY, hellY+15) : rndi(LSEA+1, WORLD_H-2);
+      const n=rndi(4,12);
       for(let s=0;s<n;s++){
         if(inW(x,y) && tiles[idx(x,y)]===T.ASH) tiles[idx(x,y)]=T.HELLST;
         x+=rndi(-1,1); y+=rndi(-1,1); x=clamp(x,2,WORLD_W-3); y=clamp(y,hellY+1,WORLD_H-2); }
     }
-    /* ============ HELM HOUSES: Terraria underworld ruins ============
-       15-21 wide, 2-3 storeys, 1-block hellbrick walls, PLATFORM floors
-       with a 3-wide climbing gap, 3-tall doorways, a chest INSIDE on the
-       ground floor (+ often an upper floor), torches on the back wall. */
-    let lastHouse=-999, houseN=0;
-    for(let x=24;x<WORLD_W-42;x++){
-      const fT=clamp(flr[x],LSEA-8,LSEA+10);
-      if(fT > LSEA-4) continue;                    /* needs dry land */
-      if(x-lastHouse<70 || rng()>0.55) continue;
-      const w = rndi(15,21);
-      let ok=true, bmin=1e9, bmax=-1e9;
-      for(let xx=x; xx<x+w; xx++){ const f2=clamp(flr[xx],LSEA-8,LSEA+10);
-        if(f2 > LSEA-4) ok=false; bmin=Math.min(bmin,f2); bmax=Math.max(bmax,f2); }
-      if(!ok || bmax-bmin>2) continue;             /* footprint on dry, level land */
+    /* ---- hell houses: multi-storey hellbrick ruins with chests ---- */
+    /* houses stand on stone islands that rise OUT of the lava sea; the ash
+       floor is broken per column so lava can pool in the gaps. */
+    let lastHouse=-999;
+    for(let x=24;x<WORLD_W-46;x++){
+      if(x-lastHouse<56 || rng()>0.65) continue;
+      const w = rndi(16,22);
       lastHouse=x;
-      const base=bmin;                             /* flat interior floor row */
+      const base = LSEA - 5 - rndi(0,3);            /* floor a few rows above lava */
+      /* solid island of ash under the footprint, rising out of the lava */
+      for(let xx=x-1; xx<x+w+1; xx++){
+        for(let yy=base; yy<WORLD_H; yy++) if(inW(xx,yy)) tiles[idx(xx,yy)]=T.ASH; }
       const stories = rndi(2,3);
       const topRow = base - stories*5;
-      /* level the foundation, then the shell */
-      for(let xx=x; xx<x+w; xx++) for(let yy=base; yy<=bmax; yy++) if(inW(xx,yy) && tiles[idx(xx,yy)]===T.AIR) tiles[idx(xx,yy)]=T.HELLBRICK;
       for(let yy=topRow; yy<base; yy++) for(let xx=x; xx<x+w; xx++){
         if(!inW(xx,yy)) continue;
         const edge=(xx===x||xx===x+w-1||yy===topRow);
         tiles[idx(xx,yy)] = edge?T.HELLBRICK:T.AIR;
         walls[idx(xx,yy)] = T.HELLBRICK; }
-      /* platform floors between storeys with a 3-wide gap to climb through */
       for(let s=1; s<stories; s++){
         const fy = base - s*5;
         const gap = x + 2 + Math.floor(rng()*(w-6));
-        for(let xx=x+1; xx<x+w-1; xx++){
-          if(xx>=gap && xx<gap+3) continue;
-          tiles[idx(xx,fy)] = T.PLAT; }
-      }
+        for(let xx=x+1; xx<x+w-1; xx++){ if(xx>=gap && xx<gap+3) continue; tiles[idx(xx,fy)] = T.PLAT; } }
       /* 3-tall doorways on the ground storey, both sides (Terraria doors) */
-      for(let yy=base-3; yy<=base-1; yy++){
-        if(inW(x,yy)) tiles[idx(x,yy)]=T.AIR;
-        if(inW(x+w-1,yy)) tiles[idx(x+w-1,yy)]=T.AIR; }
-      /* torches on the back wall */
+      for(let yy=base-3; yy<=base-1; yy++){ if(inW(x,yy)) tiles[idx(x,yy)]=T.AIR; if(inW(x+w-1,yy)) tiles[idx(x+w-1,yy)]=T.AIR; }
       for(const tx of [x+2, x+w-3]) if(inW(tx,base-3)) tiles[idx(tx,base-3)]=T.TORCH;
-      /* CHEST INSIDE the building (the user asked for exactly this) */
       const chx = x + 2 + rndi(0, w-5);
-      addChest(chx, base-1, T.CHESTH, lootHell());
-      if(rng()<0.45){
-        const c2x = x + 2 + rndi(0, w-5), c2y = base-6;
-        if(inW(c2x,c2y) && tiles[idx(c2x,c2y)]===T.AIR && tiles[idx(c2x,c2y+1)]===T.PLAT)
-          addChest(c2x, c2y, T.CHESTH, lootHell()); }
-      houseN++;
+      addChest(chx, base-1, T.CHESTH, loot('underworld'));
+      if(rng()<0.5){ const c2x = x + 2 + rndi(0, w-5), c2y = base-6;
+        if(inW(c2x,c2y) && tiles[idx(c2x,c2y)]===T.AIR && tiles[idx(c2x,c2y+1)]===T.PLAT) addChest(c2x, c2y, T.CHESTH, loot('underworld')); }
+      if(inW(x+w-3, topRow+1)) tiles[idx(x+w-3, topRow+1)]=T.TORCH;
     }
-    /* a few extra shore chests for explorers who do not loot the houses */
-    for(let i=0;i<3;i++){ const s=findFloor(455,500,20,WORLD_W-20); if(s && biomeAt(s.x,s.y)==='hell') addChest(s.x,s.y,T.CHESTH,lootHell()); }
+    /* a few extra chests atop the lava-floor pillars for explorers */
+    for(let i=0;i<4;i++){ const s=findFloor(LSEA+2,WORLD_H-4,20,WORLD_W-20); if(s && biomeAt(s.x,s.y)==='hell'){
+      if(tiles[idx(s.x,s.y-1)]===T.AIR) addChest(s.x,s.y,T.CHESTH,loot('underworld')); } }
   }
 
   /* ---- 7. liquids ---- */
-  /* oceans: flat sea level over the seabed */
   for(let x=0;x<WORLD_W;x++){ if(!isOceanCol(x)) continue;
     for(let y=SEA; y<SURF[x]; y++){ liq[idx(x,y)]=1; liqL[idx(x,y)]=LMAX; } }
-  /* surface ponds (carved basins - water rests IN terrain pockets) */
-  for(let i=0;i<18;i++){ const x=rndi(140, 760) + (rng()<0.4? rndi(60,140):0);
-    if(Math.abs(x-600)<24 || biomeAt(x,SURF[x])!=='forest') continue;
+  /* surface ponds resting IN terrain pockets */
+  for(let i=0;i<20;i++){ const x=rndi(140, 760) + (rng()<0.4? rndi(60,140):0);
+    const b=bandOf(x); if(b!=='forest' && b!=='snow') continue; if(Math.abs(x-600)<26) continue;
     const w=rndi(6,12), d=rndi(3,5); for(let dx=-w;dx<=w;dx++) for(let dy=0;dy<d;dy++){ const tx=x+dx, ty=SURF[tx]+dy; if(inW(tx,ty)){ tiles[idx(tx,ty)]=T.AIR; liq[idx(tx,ty)] = dy<d-1?1:0; liqL[idx(tx,ty)] = dy<d-1?LMAX:0; } } }
   /* jungle honey */
-  for(let i=0;i<6;i++){ const x=rndi(835,1005), w=rndi(5,9), d=rndi(3,4); for(let dx=-w;dx<=w;dx++) for(let dy=0;dy<d;dy++){ const tx=x+dx, ty=SURF[tx]+dy; if(inW(tx,ty)){ tiles[idx(tx,ty)]=T.AIR; liq[idx(tx,ty)]=dy<d-1?3:0; liqL[idx(tx,ty)]=dy<d-1?LMAX:0; } } }
-  /* underground water + lava pockets (they flow until they find a pocket) */
+  for(let i=0;i<7;i++){ const x=rndi(835,1005), w=rndi(5,9), d=rndi(3,4); for(let dx=-w;dx<=w;dx++) for(let dy=0;dy<d;dy++){ const tx=x+dx, ty=SURF[tx]+dy; if(inW(tx,ty)){ tiles[idx(tx,ty)]=T.AIR; liq[idx(tx,ty)]=dy<d-1?3:0; liqL[idx(tx,ty)]=dy<d-1?LMAX:0; } } }
+  /* underground water + lava pockets */
   function floodBlob(x,y,type,max){ let cells=[[x,y]], n=0;
     while(cells.length && n<max){ const [cx,cy]=cells.pop(); if(!inW(cx,cy)||tiles[idx(cx,cy)]!==T.AIR||liq[idx(cx,cy)]) continue;
       liq[idx(cx,cy)]=type; liqL[idx(cx,cy)]=LMAX; n++; for(const [dx,dy] of [[1,0],[-1,0],[0,1]]) cells.push([cx+dx,cy+dy]); } }
-  for(let i=0;i<55;i++) floodBlob(rndi(CX0,CX1), rndi(170,235), 1, rndi(30,80));
-  for(let i=0;i<42;i++) floodBlob(rndi(CX0,CX1), rndi(260,395), 2, rndi(24,70));
+  for(let i=0;i<60;i++) floodBlob(rndi(CX0,CX1), rndi(160,240), 1, rndi(30,80));
+  for(let i=0;i<50;i++) floodBlob(rndi(CX0,CX1), rndi(CAVERN_Y,hellY-10), 2, rndi(24,70));
 
-  /* ---- 8. ores ---- */
-  for(let i=0;i<320;i++){ let x=rndi(6,WORLD_W-6), y=rndi(150,405), n=rndi(4,9);
-    for(let s=0;s<n;s++){ if(inW(x,y) && [T.STONE,T.DIRT,T.SNOW,T.ICE,T.MUD,T.SAND,T.SANDST].includes(tiles[idx(x,y)])) tiles[idx(x,y)]=T.IRON;
-      x+=rndi(-1,1); y+=rndi(-1,1); x=clamp(x,2,WORLD_W-3); y=clamp(y,120,WORLD_H-3); } }
-  for(let i=0;i<200;i++){ let x=rndi(6,WORLD_W-6), y=rndi(170,405), n=rndi(2,4);
+  /* ---- 8. ores (iron upper, diamond deeper - Terraria depth bands) ---- */
+  for(let i=0;i<380;i++){ let x=rndi(6,WORLD_W-6), y=rndi(140,hellY-6), n=rndi(4,10);
+    for(let s=0;s<n;s++){ if(inW(x,y) && [T.STONE,T.DIRT,T.SNOW,T.ICE,T.MUD,T.SAND,T.SANDST,T.EBON].includes(tiles[idx(x,y)])) tiles[idx(x,y)]=T.IRON;
+      x+=rndi(-1,1); y+=rndi(-1,1); x=clamp(x,2,WORLD_W-3); y=clamp(y,110,WORLD_H-3); } }
+  for(let i=0;i<230;i++){ let x=rndi(6,WORLD_W-6), y=rndi(CAVERN_Y-30,hellY-4), n=rndi(2,5);
     for(let s=0;s<n;s++){ if(inW(x,y) && [T.STONE,T.ICE,T.EBON,T.MUD].includes(tiles[idx(x,y)])) tiles[idx(x,y)]=T.DIAM;
-      x+=rndi(-1,1); y+=rndi(-1,1); x=clamp(x,2,WORLD_W-3); y=clamp(y,150,WORLD_H-3); } }
-  /* obsidian near lava */
-  for(let i=0;i<90;i++){ const x=rndi(30,WORLD_W-30), y=rndi(250,WORLD_H-12); if(tiles[idx(x,y)]===T.STONE&&liq[idx(x,y)]===0) for(let dx=0;dx<rndi(2,5);dx++) if(tiles[idx(x+dx,y)]!==T.AIR) tiles[idx(x+dx,y)]=T.OBSID; }
+      x+=rndi(-1,1); y+=rndi(-1,1); x=clamp(x,2,WORLD_W-3); y=clamp(y,200,WORLD_H-3); } }
+  /* obsidian near underground lava */
+  for(let i=0;i<110;i++){ const x=rndi(30,WORLD_W-30), y=rndi(CAVERN_Y,WORLD_H-12); if(tiles[idx(x,y)]===T.STONE&&liq[idx(x,y)]===0) for(let dx=0;dx<rndi(2,5);dx++) if(tiles[idx(x+dx,y)]!==T.AIR) tiles[idx(x+dx,y)]=T.OBSID; }
 
-  /* ---- 9. corruption chasms ---- */
-  for(let c=0;c<4;c++){ let x = 384 + c*22 + rndi(0,5), y = SURF[x];
-    const depth = rndi(36,52);
-    for(let d=0; d<depth; d++){ const w = Math.max(1, Math.round(3.5 - d*0.04));
+  /* ---- 9. corruption chasms (deep vertical trenches w/ ebonstone walls) ---- */
+  for(let c=0;c<5;c++){ let x = 386 + c*18 + rndi(0,5), y = SURF[x];
+    const depth = rndi(44,64);
+    for(let d=0; d<depth; d++){ const w = Math.max(1, Math.round(3.5 - d*0.03));
       const cx = x + Math.round(Math.sin(d*0.3)*2.5);
       for(let dx=-w;dx<=w;dx++) if(inW(cx+dx,y+d)){ tiles[idx(cx+dx,y+d)] = T.AIR; liq[idx(cx+dx,y+d)]=0; liqL[idx(cx+dx,y+d)]=0; walls[idx(cx+dx,y+d)]=T.EBON; } }
-    carve(x, y+depth, 7, 4); }
+    carve(x, y+depth, 8, 5); }
 
-  /* ---- 10. dungeon (1-block-thin cursed-brick tower, rooms + platforms) ---- */
-  { const x0=1140, x1=1160, cx=1150, sTop=SURF[cx]-20;
+  /* ---- 10. Dungeon: brick tower with rooms, shelves + gold chests ---- */
+  { const x0=1130, x1=1168, cx=1149, sTop=SURF[cx]-30;
     for(let x=x0;x<=x1;x++) for(let y=sTop;y<hellY;y++) walls[idx(x,y)]=T.DBRICK;
-    for(let y=sTop;y<SURF[cx]+4;y++){ for(let x=x0;x<=x1;x++){
-      const edge = (x===x0||x===x1||y===sTop||y>=SURF[cx]+3);   /* 1-thick walls: Terraria proportion */
+    /* outer shell walls (1 thick) and a solid floor near the surface */
+    for(let y=sTop;y<SURF[cx]+6;y++){ for(let x=x0;x<=x1;x++){
+      const edge = (x===x0||x===x1||y===sTop);
       tiles[idx(x,y)] = edge? T.DBRICK : T.AIR;
-      if((y-sTop)%6===0 && !edge && rng()<0.3) tiles[idx(x,y)]=T.GBRICK;
     } }
-    for(let y=SURF[cx]-4;y<SURF[cx]+3;y++) for(let x=x0;x<=x0+5;x++) tiles[idx(x,y)]=T.AIR;
-    let ry = SURF[cx]+12;
-    for(let r=0;r<6;r++){ const rx=rndi(x0+4,x1-7), rw=rndi(5,7), rh=rndi(4,5);
+    /* entrance: a 4-wide gap in the roof + a shaft down into the top room */
+    for(let y=sTop-2;y<sTop+5;y++) for(let x=cx-2;x<=cx+1;x++) if(inW(x,y)) tiles[idx(x,y)]=T.AIR;
+    for(let x=cx-3;x<=cx+2;x++){ if(inW(x,sTop-3)) tiles[idx(x,sTop-3)]=T.DBRICK; }
+    /* stacked rooms with brick rings, platforms and lanterns */
+    let ry = SURF[cx]+2;
+    for(let r=0;r<11 && ry<hellY-12;r++){
+      const rx=rndi(x0+8,x1-9), rw=rndi(6,9), rh=rndi(4,6);
       carve(rx, ry, rw, rh);
-      for(let y=ry-rh-2;y<=ry+rh+2;y++) for(let x=rx-rw-2;x<=rx+rw+2;x++){ if(!inW(x,y)) continue;
+      for(let y=ry-rh-2;y<=ry+rh+2;y++) for(let x=rx-rw-2;x<=rx+rw+2;x++){
+        if(!inW(x,y) || x<x0 || x>x1) continue;
         const inRoom = ((x-rx)/rw)**2+((y-ry)/rh)**2 <= 1;
-        const inRing = ((x-rx)/(rw+1.6))**2+((y-ry)/(rh+1.6))**2 <= 1;
+        const inRing = ((x-rx)/(rw+1.7))**2+((y-ry)/(rh+1.7))**2 <= 1;
         if(inRing && !inRoom) tiles[idx(x,y)]= (rng()<0.15)?T.GBRICK:T.DBRICK; }
-      /* a wooden platform shelf across the room (Terraria dungeon platforms) */
-      for(let xx=rx-rw+1; xx<=rx+rw-1; xx++) if(xx%3!==0 && inW(xx,ry+1) && tiles[idx(xx,ry+1)]===T.AIR) tiles[idx(xx,ry+1)]=T.PLAT;
-      for(let y=ry+rh; y<ry+rh+14; y++) for(let x=rx-1;x<=rx+2;x++) if(inW(x,y)) tiles[idx(x,y)]=T.AIR;
-      ry += rndi(16,20); if(ry>340) ry=340;
+      /* wooden platform shelves across the room (Terraria dungeon platforms) */
+      for(let xx=rx-rw+1; xx<=rx+rw-1; xx+=1) if(xx%3!==0 && inW(xx,ry+1) && tiles[idx(xx,ry+1)]===T.AIR) tiles[idx(xx,ry+1)]=T.PLAT;
+      /* chain of rooms downward */
+      for(let y=ry+rh; y<ry+rh+13; y++) for(let x=rx-1;x<=rx+2;x++) if(inW(x,y)) tiles[idx(x,y)]=T.AIR;
+      if(inW(rx-rw+2, ry)) tiles[idx(rx-rw+2, ry)]=T.TORCH;
+      ry += rndi(13,17); if(ry>hellY-14) break;
     }
-    dungeonZone = {x0:1138, x1:1162, top:sTop-2, bot:350}; }
+    dungeonZone = {x0:x0-2, x1:x1+2, top:sTop-2, bot:hellY-12}; }
 
   /* ---- 11. decor: flowers, glow shrooms, vines, cacti ---- */
   for(let x=2;x<WORLD_W-2;x++){ const s=SURF[x], t=tiles[idx(x,s)];
     if((t===T.GRASS||t===T.JGRASS) && tiles[idx(x,s-1)]===T.AIR && rng()<0.3) tiles[idx(x,s-1)] = rng()<0.3?T.FLOWER:T.TGRASS; }
-  for(let i=0;i<90;i++){ const x=rndi(10,WORLD_W-10), y=rndi(200,390);
+  for(let i=0;i<110;i++){ const x=rndi(10,WORLD_W-10), y=rndi(CAVERN_Y-40,hellY-10);
     if(tiles[idx(x,y)]===T.STONE && tiles[idx(x,y-1)]===T.AIR && rng()<0.8) tiles[idx(x,y-1)]=T.GMUSH; }
-  for(let x=835;x<1005;x++){ for(let y=SURF[x];y<230;y++){ if((tiles[idx(x,y)]===T.MUD||tiles[idx(x,y)]===T.JGRASS) && tiles[idx(x,y+1)]===T.AIR && rng()<0.18){ let len=rndi(2,5); for(let v=0;v<len&&inW(x,y+v+1)&&tiles[idx(x,y+v+1)]===T.AIR;v++) tiles[idx(x,y+v+1)]=T.VINE; } } }
+  for(let x=835;x<1005;x++){ for(let y=SURF[x];y<250;y++){ if((tiles[idx(x,y)]===T.MUD||tiles[idx(x,y)]===T.JGRASS) && tiles[idx(x,y+1)]===T.AIR && rng()<0.18){ let len=rndi(2,5); for(let v=0;v<len&&inW(x,y+v+1)&&tiles[idx(x,y+v+1)]===T.AIR;v++) tiles[idx(x,y+v+1)]=T.VINE; } } }
   for(let x=1020;x<1115;x++){ if(rng()<0.14){ const h=rndi(2,4); let ok=true; for(let y=SURF[x]-h;y<SURF[x];y++) if(tiles[idx(x,y)]!==T.AIR) ok=false;
     if(ok){ for(let y=SURF[x]-h;y<SURF[x];y++) tiles[idx(x,y)]=T.CACTUS; } } }
 
-  /* ---- 12. trees (palms ALL along the wide dry beaches) ---- */
+  /* ---- 12. trees (palms on the beaches, biome trees inland) ---- */
   function addTree(x, baseY, type, h){
     for(let y=baseY-1; y>baseY-h-1; y--) if(inW(x,y)){ if(tiles[idx(x,y)]!==T.AIR && y>baseY-3) return; }
     for(let y=baseY-1; y>baseY-h-1; y--) tiles[idx(x,y)]=T.TRUNK;
     trees.push({x, y:baseY, h, type, alive:true}); }
   function treeType(b){ return b==='snow'?'boreal': b==='jungle'?'jungle': b==='corruption'?'dead': b==='ocean'?'palm': 'oak'; }
-  const nearOcean = x => isOceanCol(x) || x < OW_L+8 || x >= WORLD_W-OW_R-8;
+  const nearOcean = x => isOceanCol(x) || x < OW_L+9 || x >= WORLD_W-OW_R-9;
   const roomFor = x => !trees.length || trees[trees.length-1].x <= x-4;
   for(let x=6;x<WORLD_W-6;x++){
-    if(nearOcean(x)){ /* palms along the whole dry beach - dense like Terraria */
-      if(SURF[x] < SEA && tiles[idx(x,SURF[x])]===T.SAND && tiles[idx(x,SURF[x]-1)]===T.AIR){
-        if((!trees.length || trees[trees.length-1].x <= x-4) && rng()<0.75) addTree(x, SURF[x], 'palm', rndi(9,14)); }
-      continue; }
+    if(nearOcean(x)){ if(SURF[x] < SEA && tiles[idx(x,SURF[x])]===T.SAND && tiles[idx(x,SURF[x]-1)]===T.AIR){
+        if(roomFor(x) && rng()<0.75) addTree(x, SURF[x], 'palm', rndi(9,14)); } continue; }
     const b=biomeAt(x,SURF[x]-1); const s=tiles[idx(x,SURF[x])];
     if((b==='forest'||b==='snow'||b==='jungle'||b==='corruption') && [T.GRASS,T.JGRASS,T.EGRASS,T.SNOW].includes(s)
       && !(liq[idx(x,SURF[x])]&&liqL[idx(x,SURF[x])]) && !(liq[idx(x,SURF[x]-1)]&&liqL[idx(x,SURF[x]-1)])){
       if(roomFor(x) && rng()<0.30) addTree(x, SURF[x], treeType(b), b==='jungle'?rndi(11,17):b==='snow'?rndi(7,11):rndi(8,14)); }
   }
-  /* island trees */
-  for(const isl of islands){ if(rng()<0.6 && isl.treeX!==undefined){
-    addTree(isl.treeX, isl.base, 'oak', rndi(6,8)); } }
+  for(const isl of islands){ if(rng()<0.6 && isl.treeX!==undefined){ addTree(isl.treeX, isl.base, 'oak', rndi(6,8)); } }
 
-  /* ---- 13. spawn area (flattened WIDE so you can stroll both ways) ---- */
+  /* ---- 13. spawn plateau (flat so you can stroll both ways) ---- */
   const sx=600; const sy=SURF[600];
-  for(let x=sx-10;x<=sx+10;x++) if(inW(x,0)){
-    for(let y=Math.max(1,sy-16);y<sy+3;y++) if(tiles[idx(x,y)]===T.TRUNK) tiles[idx(x,y)]=T.AIR; }
-  for(let x=sx-9;x<=sx+9;x++){ if(!inW(x,0)) continue;
+  for(let x=sx-12;x<=sx+12;x++) if(inW(x,0)){
+    for(let y=Math.max(1,sy-18);y<sy+3;y++) if(tiles[idx(x,y)]===T.TRUNK) tiles[idx(x,y)]=T.AIR; }
+  for(let x=sx-11;x<=sx+11;x++){ if(!inW(x,0)) continue;
     const old=SURF[x]; SURF[x]=sy;
     tiles[idx(x,sy)]=T.GRASS;
-    for(let y=sy+1; y<Math.max(sy+1, old); y++) if(inW(x,y)) tiles[idx(x,y)]=T.DIRT;   /* fill any dip */
-    for(let y=sy-7;y<sy;y++) if(inW(x,y) && tiles[idx(x,y)]!==T.AIR) tiles[idx(x,y)]=T.AIR;
-    for(let y=sy-9;y<sy+9;y++) if(inW(x,y)){ liq[idx(x,y)]=0; liqL[idx(x,y)]=0; } }
-  trees = trees.filter(tr=>!(Math.abs(tr.x-sx)<11 && Math.abs(tr.y-SURF[sx])<6));
+    for(let y=sy+1; y<Math.max(sy+1, old); y++) if(inW(x,y)) tiles[idx(x,y)]=T.DIRT;
+    for(let y=sy-8;y<sy;y++) if(inW(x,y) && tiles[idx(x,y)]!==T.AIR) tiles[idx(x,y)]=T.AIR;
+    for(let y=sy-10;y<sy+10;y++) if(inW(x,y)){ liq[idx(x,y)]=0; liqL[idx(x,y)]=0; } }
+  trees = trees.filter(tr=>!(Math.abs(tr.x-sx)<13 && Math.abs(tr.y-SURF[sx])<6));
   spawnPt = {x:sx+0.6, y:sy-3};
 
-  /* ---- 14. chests & pots & life crystals ---- */
-  /* surface chests + guaranteed uniques (+ platforms so you can build with them early) */
-  const surfSpots=[]; for(let i=0;i<64;i++){ const s=findFloor(SURF[600]-8, SURF[600]+2, 30, WORLD_W-40); if(s) surfSpots.push(s); }
-  const uniques=['magicMirror','hermesBoots','cloudBottle','luckyHorseshoe','feralClaws','hermesBoots','magicMirror','cloudBottle','luckyHorseshoe','feralClaws'];
-  surfSpots.slice(0,60).forEach((s,i)=>{ const L=lootGeneric(false);
-    if(i<uniques.length) L.push({id:uniques[i], n:1});
-    if(rng()<0.35) L.push({id:'platform', n:rndi(15,30)});
-    if(i===10) L.push({id:'ironBar', n:5});
-    addChest(s.x,s.y, T.CHEST, L); });
-  /* underground chests */
-  let placed=0; for(let t=0;t<9000&&placed<56;t++){ const s=findFloor(165,390,10,WORLD_W-10);
-    if(s && !chests.has(idx(s.x,s.y)) && biomeAt(s.x,s.y)!=='dungeon'){ addChest(s.x,s.y,T.CHEST,lootGeneric(true)); placed++; } }
-  /* ice chests */
-  for(let i=0;i<10;i++){ const s=findFloor(SURF[200]+6,230,130,288); if(s) addChest(s.x,s.y,T.CHEST,(()=>{const L=lootGeneric(true);L.push({id:'ice',n:rndi(8,20)});return L;})()); }
-  /* jungle shrines */
-  for(let i=0;i<8;i++){ const s=findFloor(130,220,835,1005); if(s){ for(let dx=-3;dx<=3;dx++) for(let dy=-2;dy<=1;dy++){ if(inW(s.x+dx,s.y+dy)){ const edge=Math.abs(dx)===3||dy===-2||dy===1; tiles[idx(s.x+dx,s.y+dy)]= edge?T.GBRICK:(dy===0&&dx===0?T.CHEST:T.AIR); if(edge) walls[idx(s.x+dx,s.y+dy)]=T.DBRICK; } }
-    chests.set(idx(s.x,s.y),{x:s.x,y:s.y,items:(()=>{const L=lootGeneric(true);L.push({id:'stinger',n:rndi(2,5)});return L;})(),type:T.CHEST,open:false}); } }
-  /* desert chests */
-  for(let i=0;i<8;i++){ const x=rndi(1015,1115), y=SURF[x]+rndi(6,16); if(inW(x,y)&&[T.SAND,T.SANDST].includes(tiles[idx(x,y)])){ tiles[idx(x,y)]=T.CHEST; chests.set(idx(x,y),{x,y,items:lootGeneric(false),type:T.CHEST,open:false}); } }
+  /* ---- 14. chests, pots & life crystals (Terraria-accurate placement) ---- */
+  /* surface chests: rare, on flat forest/beach ground */
+  let placed=0; for(let t=0;t<9000&&placed<22;t++){ const s=findFloor(SURF[600]-4, SURF[600]+3, 40, WORLD_W-40);
+    if(s && !chests.has(idx(s.x,s.y)) && biomeAt(s.x,s.y)!=='dungeon'){ if(addChest(s.x,s.y,T.CHEST,loot('surface'))) placed++; } }
+  /* underground chests: scattered through the dirt/stone layer */
+  placed=0; for(let t=0;t<12000&&placed<44;t++){ const s=findFloor(ROCK_Y-10, CAVERN_Y, 14, WORLD_W-14);
+    if(s && biomeAt(s.x,s.y)!=='dungeon' && !chests.has(idx(s.x,s.y))){ if(addChest(s.x,s.y,T.CHEST,loot('underground'))) placed++; } }
+  /* cavern chests: more common the deeper you go */
+  placed=0; for(let t=0;t<16000&&placed<70;t++){ const s=findFloor(CAVERN_Y, hellY-10, 12, WORLD_W-12);
+    if(s && biomeAt(s.x,s.y)!=='dungeon' && !chests.has(idx(s.x,s.y))){ if(addChest(s.x,s.y,T.CHEST,loot('cavern'))) placed++; } }
+  /* ice biome chests (snow band) */
+  for(let i=0;i<12;i++){ const s=findFloor(SURF[200]+8,CAVERN_Y,120,300); if(s && biomeAt(s.x,s.y)!=='dungeon'){ const L=loot('ice'); L.push({id:'ice',n:rndi(8,20)}); addChest(s.x,s.y,T.CHEST,L); } }
+  /* jungle shrines: small goldbrick shrine buried in the ground around a chest */
+  for(let i=0;i<8;i++){ const s=findFloor(130,CAVERN_Y,835,1005); if(!s) continue;
+    if(tiles[idx(s.x,s.y)]!==T.AIR) continue;
+    if(s.y < SURF[clamp(s.x,0,WORLD_W-1)]+10) continue;      /* must be buried, Terraria-style */
+    for(let dx=-3;dx<=3;dx++) for(let dy=-2;dy<=1;dy++){ if(inW(s.x+dx,s.y+dy)){ const edge=Math.abs(dx)===3||dy===-2||dy===1; tiles[idx(s.x+dx,s.y+dy)]= edge?T.GBRICK:T.AIR; if(edge) walls[idx(s.x+dx,s.y+dy)]=T.DBRICK; } }
+    const L=loot('jungle'); L.push({id:'stinger',n:rndi(2,5)}); addChest(s.x,s.y,T.CHEST,L); }
+  /* desert chests (underground desert) */
+  for(let i=0;i<8;i++){ const s=findFloor(SURF[1060]+8,CAVERN_Y,1015,1115); if(s && biomeAt(s.x,s.y)!=='dungeon') addChest(s.x,s.y,T.CHEST,loot('desert')); }
+  /* corruption chests */
+  for(let i=0;i<6;i++){ const s=findFloor(SURF[420]+8,CAVERN_Y,382,478); if(s && biomeAt(s.x,s.y)!=='dungeon') addChest(s.x,s.y,T.CHEST,loot('corruption')); }
   /* ocean chests sunk on the seabed */
   for(let side=0;side<2;side++){
-    const oceanUniq = side===0 ? 'cloudBottle' : 'hermesBoots';
-    for(let i=0;i<3;i++){
-      const x = side===0 ? rndi(8, OW_L-18) : rndi(WORLD_W-OW_R+14, WORLD_W-9);
+    for(let i=0;i<4;i++){
+      const x = side===0 ? rndi(8, OW_L-16) : rndi(WORLD_W-OW_R+12, WORLD_W-9);
       const y=SURF[x]-1;
       if(inW(x,y) && tiles[idx(x,y)]===T.AIR && liq[idx(x,y)]===1 && isSolid(tiles[idx(x,y+1)])){
-        const L=[{id:'coin',n:rndi(1000,2500)},{id:'ironOre',n:rndi(6,14)},{id:'gel',n:rndi(3,7)}];
-        if(i===0) L.push({id:oceanUniq,n:1});
-        addChest(x,y,T.CHEST,L); } } }
-  /* dungeon gold chests */
-  const dungLoot=['muramasa','handgun','waterBolt','aquaScepter','blueMoon','cobaltShield','muramasa','waterBolt'];
-  for(let i=0;i<8;i++){ const s=findFloor(SURF[1150]+8,180,1142,1158); if(s){ const L=[{id:'coin',n:rndi(3000,6000)},{id:'bone',n:rndi(4,10)},{id:dungLoot[i],n:1}]; addChest(s.x,s.y,T.CHESTG,L); } }
+        addChest(x,y,T.CHEST, loot('ocean')); } } }
+  /* dungeon gold chests: on the room shelves / floors */
+  for(let i=0;i<10;i++){ const s=findFloor(SURF[1151]+6, hellY-12, 1142, 1160); if(s && biomeAt(s.x,s.y)==='dungeon'){
+    addChest(s.x,s.y,T.CHESTG, loot('dungeon')); } }
   /* sky island chests */
-  { let ui2=0; const skyUniq=['luckyHorseshoe','cloudBottle','hermesBoots','feralClaws','honeyComb','luckyHorseshoe','cloudBottle','hermesBoots','feralClaws'];
-    for(const isl of islands){ if(isl.chestX===undefined) continue;
-      const L=[{id:'coin',n:rndi(500,1500)},{id:'fallenStar',n:3}];
-      if(ui2<skyUniq.length) L.push({id:skyUniq[ui2],n:1});
-      ui2++;
-      addChest(isl.chestX, isl.chestY, T.CHEST, L); } }
+  { for(const isl of islands){ if(isl.chestX===undefined) continue;
+    addChest(isl.chestX, isl.chestY, T.CHEST, loot('sky')); } }
   /* pots everywhere (never stacked: solid floor required) */
-  for(let t=0;t<1300;t++){ const y0=rng()<0.3? SURF[600]-2 : 165; const s=findFloor(y0, 500, 8, WORLD_W-8);
+  for(let t=0;t<1400;t++){ const y0=rng()<0.3? SURF[600]-2 : CAVERN_Y-40; const s=findFloor(y0, hellY-6, 8, WORLD_W-8);
     if(s && !chests.has(idx(s.x,s.y)) && tiles[idx(s.x,s.y)]!==T.POT){ tiles[idx(s.x,s.y)]=T.POT; pots.push({x:s.x,y:s.y,alive:true}); }
     if(pots.length>=900) break; }
   /* life crystals */
-  for(let t=0;t<9000;t++){ const s=findFloor(165,400,8,WORLD_W-8);
+  for(let t=0;t<9000;t++){ const s=findFloor(150,hellY-8,8,WORLD_W-8);
     if(s && !chests.has(idx(s.x,s.y)) && tiles[idx(s.x,s.y)]===T.AIR && lifePickups.filter(p=>Math.abs(p.x-s.x)<9&&Math.abs(p.y-s.y)<9).length===0)
       lifePickups.push({x:s.x+0.5, y:s.y+0.4, id:'lifeCrystal', taken:false});
     if(lifePickups.length>=60) break; }
-  /* clear stray floating tiles (platforms are ALLOWED to float, like Terraria) */
+  /* clear stray floating tiles (platforms are ALLOWED to float, like Terraria;
+     never remove a tile that is holding up a chest/pot) */
   for(let y=1;y<WORLD_H-1;y++) for(let x=1;x<WORLD_W-1;x++){ const t=tiles[idx(x,y)];
     if(t&&t!==T.AIR&&t!==T.TRUNK&&t!==T.CACTUS&&t!==T.FLOWER&&t!==T.TGRASS&&t!==T.GMUSH&&t!==T.VINE&&t!==T.TORCH&&t!==T.PLAT&&t!==T.POT){
+      const above=tiles[idx(x,y-1)];
+      if(above===T.CHEST||above===T.CHESTG||above===T.CHESTH||above===T.POT) continue;
       if(tiles[idx(x-1,y)]===T.AIR&&tiles[idx(x+1,y)]===T.AIR&&tiles[idx(x,y-1)]===T.AIR&&tiles[idx(x,y+1)]===T.AIR&&liq[idx(x,y)]===0){ let any=false;
         if(walls[idx(x,y)]) any=true; if(!any) tiles[idx(x,y)]=T.AIR; } } }
+  /* final guarantee: no chest or pot is left floating (give it a floor) */
+  for(const [,ch] of chests){ const bx=ch.x, by=ch.y+1; if(!inW(bx,by)) continue;
+    const b=tiles[idx(bx,by)];
+    if(!(b!==T.AIR && (isSolid(b)||b===T.PLAT))){
+      tiles[idx(bx,by)] = by>=hellY ? T.ASH : (by<ROCK_Y ? T.DIRT : T.STONE);
+      if(!walls[idx(bx,by)]) walls[idx(bx,by)] = tiles[idx(bx,by)]; } }
 }
 
-/* ---------- sky islands: dirt blobs w/ plateau, gold shrine + chest.
+/* ---------- sky islands: dirt blobs w/ a plateau, gold shrine + chest.
     BONE DRY by design: water never floats in the sky in this world. ---------- */
 function genSkyIslands(){
-  const spots=[[150,30],[285,25],[415,33],[545,27],[675,24],[805,31],[935,26],[1065,33],[1120,28]];   /* spread wide, away from spawn 600 */
+  const spots=[[150,30],[285,25],[415,33],[545,27],[675,24],[805,31],[935,26],[1065,33],[1120,28]];
   for(const [bx,by] of spots){
     const cx=bx+rndi(-3,3), cy=by+rndi(-2,2);
     const rx=rndi(10,14), ry=rndi(4,6);
     const isl={x:cx,y:cy,rx,ry,tops:{}};
-    /* teardrop body: wide crown + narrower hanging base */
     for(const [erx,ery,ecy] of [[rx,Math.max(3,Math.round(ry*0.8)),cy-Math.round(ry*0.2)],[Math.round(rx*0.62),Math.max(3,Math.round(ry*0.8)),cy+Math.round(ry*0.35)]]){
       for(let y=ecy-ery;y<=ecy+ery;y++) for(let x=cx-erx;x<=cx+erx;x++){
         if(!inW(x,y)) continue;
         if(((x-cx)/erx)**2+((y-ecy)/ery)**2<=1) tiles[idx(x,y)]=T.DIRT;
       }
     }
-    /* grass every column top + record it */
     for(let x=cx-rx;x<=cx+rx;x++){
       for(let y=cy-ry-3;y<=cy+2;y++){ if(!inW(x,y)) continue;
         if(tiles[idx(x,y)]===T.DIRT && (y===0 || tiles[idx(x,y-1)]===T.AIR)){ tiles[idx(x,y)]=T.GRASS; isl.tops[x]=y; break; } }
     }
-    /* flatten a plateau across the crown */
     const base = isl.tops[cx]!==undefined ? isl.tops[cx] : cy-Math.round(ry*0.8);
     for(let x=cx-rx+2;x<=cx+rx-2;x++){
       if(isl.tops[x]===undefined) continue;
@@ -2497,9 +2610,7 @@ function genSkyIslands(){
       tiles[idx(x,base)]=T.GRASS; isl.tops[x]=base;
     }
     isl.base=base;
-    /* grass decor on the plateau */
     for(let x=cx-rx+2;x<=cx+rx-2;x++){ if(rng()<0.25 && tiles[idx(x,base-1)]===T.AIR) tiles[idx(x,base-1)] = rng()<0.35?T.FLOWER:T.TGRASS; }
-    /* golden shrine pavilion on the plateau (right side) */
     const sx0=cx+1, sx1=Math.min(cx+rx-1, sx0+6);
     if(sx1-sx0>=4){
       for(let x=sx0;x<=sx1;x++){ if(isl.tops[x]===undefined) continue;
@@ -2510,7 +2621,6 @@ function genSkyIslands(){
       const chx=Math.floor((sx0+sx1)/2);
       isl.chestX=chx; isl.chestY=base-1;
     }
-    /* a lone tree at the left end */
     const treeX=cx-rx+2;
     if(rng()<0.6 && isl.tops[treeX]!==undefined) isl.treeX=treeX;
     islands.push(isl);
@@ -2661,46 +2771,51 @@ const Synth = {
     const t = Snd.ctx.currentTime, T=this.tone.bind(this), H=this.hiss.bind(this);
     const rv = Math.max(0.02, v), f = Math.max(0.4, Math.min(1.8, r));   /* r doubles as pitch mult */
     switch(key){
-      case 'sfx_hurt':   T(t,0.16,'square',300*f,110*f,0.4*rv); H(t,0.1,0.22*rv,900,300); break;
-      case 'sfx_death':  T(t,0.6,'sawtooth',280*f,42,0.42*rv); H(t,0.5,0.3*rv,700,120,'lowpass'); break;
-      case 'sfx_jump':   T(t,0.14,'sine',180*f,420*f,0.26*rv); break;
-      case 'sfx_land':   H(t,0.11,0.34*rv,520,140,'lowpass'); T(t,0.09,'triangle',130*f,70,0.26*rv); break;
-      case 'sfx_walk':   H(t,0.06,0.15*rv,430*f,240,'lowpass'); T(t,0.05,'triangle',120*f,85,0.08*rv); break;
-      case 'sfx_swing':  H(t,0.15,0.28*rv,650*f,2600*f,'bandpass',1.6); break;
-      case 'sfx_pickup': T(t,0.08,'square',620*f,930*f,0.2*rv); T(t+0.06,0.09,'sine',1240*f,1240*f,0.16*rv); break;
-      case 'sfx_coin':   T(t,0.06,'square',1046,1046,0.24*rv); T(t+0.06,0.14,'square',1568,1568,0.24*rv); break;
-      case 'sfx_break':  H(t,0.13,0.4*rv,950*f,260,'bandpass',0.8); T(t,0.1,'triangle',230*f,85,0.26*rv); break;
-      case 'sfx_dig':    H(t,0.05,0.2*rv,480*f,260,'bandpass',1.2); T(t,0.03,'square',170*f,120,0.12*rv); break;
-      case 'sfx_drill':  T(t,0.09,'sawtooth',92*f,92*f,0.2*rv); H(t,0.09,0.14*rv,2600,2200,'highpass'); break;
-      case 'sfx_place':  T(t,0.08,'triangle',160*f,95,0.34*rv); H(t,0.05,0.18*rv,320,180,'lowpass'); break;
-      case 'sfx_chest':  T(t,0.1,'triangle',240*f,165,0.22*rv); H(t,0.09,0.12*rv,700,300); T(t+0.1,0.16,'sine',520*f,520*f,0.18*rv); break;
-      case 'sfx_craft':  T(t,0.05,'square',840*f,820,0.22*rv); H(t,0.05,0.16*rv,3000,2000,'highpass');
-                         T(t+0.09,0.06,'square',660*f,640,0.22*rv); H(t+0.09,0.05,0.14*rv,2800,1800,'highpass'); break;
-      case 'sfx_potion': T(t,0.2,'sine',480*f,170,0.24*rv); T(t+0.17,0.1,'sine',1180*f,1500*f,0.14*rv); break;
-      case 'sfx_bow':    T(t,0.09,'triangle',400*f,170,0.24*rv); H(t,0.12,0.18*rv,900,2400,'bandpass',2); break;
-      case 'sfx_arrow_hit': H(t,0.05,0.3*rv,600,260,'lowpass'); T(t,0.04,'square',210*f,150,0.14*rv); break;
-      case 'sfx_gun':    H(t,0.13,0.5*rv,3200,320,'lowpass'); T(t,0.15,'sine',150*f,55,0.36*rv); break;
-      case 'sfx_bullet_hit': T(t,0.04,'square',1150*f,700,0.2*rv); H(t,0.04,0.2*rv,3200,2400,'highpass'); break;
-      case 'sfx_magic':  T(t,0.1,'sine',600*f,900*f,0.16*rv); T(t+0.05,0.1,'sine',760*f,1140*f,0.16*rv); T(t+0.1,0.12,'sine',920*f,1380*f,0.16*rv);
-                         H(t,0.22,0.1*rv,3800,5200,'highpass'); break;
-      case 'sfx_magic_hit': T(t,0.12,'sine',900*f,380,0.24*rv); H(t,0.08,0.18*rv,1600,700,'bandpass',1.5); break;
-      case 'sfx_summon': T(t,0.5,'sine',220*f,220*f,0.16*rv); T(t,0.5,'sine',277*f,277*f,0.14*rv); T(t,0.5,'sine',330*f,330*f,0.13*rv);
-                         H(t,0.4,0.16*rv,500,2600,'bandpass',1.4); break;
-      case 'sfx_zombie': T(t,0.42,'sawtooth',115*f,62,0.2*rv); T(t,0.42,'sawtooth',118*f,64,0.16*rv); H(t,0.3,0.08*rv,400,180,'lowpass'); break;
-      case 'sfx_slime':  T(t,0.11,'sine',300*f,110,0.22*rv); H(t,0.09,0.2*rv,260,520,'lowpass'); break;
-      case 'sfx_bat':    T(t,0.05,'sine',1900*f,2500*f,0.12*rv); break;
-      case 'sfx_skeleton': T(t,0.03,'square',300,300,0.16*rv); T(t+0.05,0.03,'square',240,240,0.16*rv); T(t+0.1,0.03,'square',320,320,0.14*rv); break;
-      case 'sfx_hornet': T(t,0.24,'sawtooth',165*f,165*f,0.16*rv); T(t,0.24,'sawtooth',171*f,171*f,0.13*rv); break;
-      case 'sfx_imp':    T(t,0.1,'square',700*f,340,0.2*rv); T(t+0.11,0.09,'square',620*f,300,0.16*rv); H(t,0.2,0.08*rv,1800,900); break;
-      case 'sfx_boss_roar': T(t,0.85,'sawtooth',92*f,38,0.4*rv); T(t,0.85,'sawtooth',96*f,40,0.3*rv); T(t,0.85,'sawtooth',47*f,24,0.3*rv);
-                         H(t,0.8,0.36*rv,900,90,'lowpass'); break;
-      case 'sfx_boss_die': T(t,1.0,'sawtooth',130*f,26,0.34*rv); H(t,1.0,0.42*rv,2200,70,'lowpass'); T(t+0.15,0.5,'square',60,24,0.2*rv); break;
-      case 'sfx_splash': H(t,0.3,0.36*rv,1300*f,380,'bandpass',0.7); T(t,0.2,'sine',300*f,90,0.2*rv); break;
-      case 'sfx_lava':   H(t,0.5,0.22*rv,3600,2800,'highpass'); break;
-      case 'sfx_star':   T(t,0.07,'sine',1760,1760,0.16*rv); T(t+0.08,0.1,'sine',2093,2093,0.14*rv); break;
-      case 'sfx_click':  T(t,0.03,'square',880,880,0.14*rv); break;
-      case 'sfx_teleport': H(t,0.38,0.3*rv,320,2600,'bandpass',1.3); T(t,0.38,'sine',300*f,1300*f,0.2*rv); break;
-      case 'sfx_hit':    H(t,0.08,0.32*rv,700,190,'lowpass'); T(t,0.08,'sine',170*f,75,0.3*rv); break;
+      /* ---- Terraria-flavoured SFX ----
+         Recipes are tuned to the real game's palette: short, dry, punchy
+         transients with a quick decay. Dig/break are material thuds with a
+         dusty noise tail; pickups are bright ascending blips; the coin is a
+         two-note chime; combat is a low thud + filtered noise. */
+      case 'sfx_hurt':   T(t,0.14,'square',300*f,120*f,0.34*rv); T(t,0.10,'triangle',160*f,90,0.3*rv); H(t,0.10,0.20*rv,1100,320,'lowpass'); break;
+      case 'sfx_death':  T(t,0.6,'sawtooth',300*f,44,0.4*rv); T(t,0.5,'square',150*f,50,0.25*rv); H(t,0.5,0.28*rv,900,140,'lowpass'); break;
+      case 'sfx_jump':   T(t,0.10,'sine',240*f,520*f,0.22*rv); H(t,0.06,0.08*rv,600,1200,'highpass'); break;
+      case 'sfx_land':   H(t,0.09,0.32*rv,620,160,'lowpass'); T(t,0.08,'sine',150*f,80,0.26*rv); break;
+      case 'sfx_walk':   H(t,0.05,0.13*rv,500*f,300,'lowpass'); T(t,0.04,'triangle',140*f,95,0.07*rv); break;
+      case 'sfx_swing':  H(t,0.14,0.26*rv,700*f,2800*f,'bandpass',1.5); T(t,0.05,'sine',420*f,700*f,0.06*rv); break;
+      case 'sfx_pickup': T(t,0.05,'square',740*f,1180*f,0.2*rv); T(t+0.045,0.08,'square',1480*f,1480*f,0.17*rv); break;
+      case 'sfx_coin':   T(t,0.05,'square',1318,1318,0.22*rv); T(t+0.055,0.16,'square',1760,1760,0.22*rv); break;
+      case 'sfx_break':  H(t,0.12,0.4*rv,1050*f,300,'bandpass',0.7); T(t,0.09,'triangle',260*f,95,0.24*rv); H(t+0.05,0.09,0.16*rv,500,220,'lowpass'); break;
+      case 'sfx_dig':    H(t,0.045,0.22*rv,520*f,300,'bandpass',1.1); T(t,0.03,'square',190*f,140,0.10*rv); break;
+      case 'sfx_drill':  T(t,0.08,'sawtooth',88*f,96*f,0.18*rv); H(t,0.08,0.12*rv,2800,2300,'highpass'); break;
+      case 'sfx_place':  T(t,0.07,'triangle',190*f,110,0.3*rv); H(t,0.045,0.16*rv,360,200,'lowpass'); break;
+      case 'sfx_chest':  T(t,0.07,'triangle',260*f,180,0.2*rv); H(t,0.07,0.1*rv,800,340); T(t+0.09,0.14,'sine',560*f,520*f,0.16*rv); break;
+      case 'sfx_craft':  T(t,0.045,'square',900*f,880,0.2*rv); H(t,0.045,0.14*rv,3200,2100,'highpass');
+                         T(t+0.08,0.05,'square',720*f,700,0.2*rv); H(t+0.08,0.045,0.12*rv,3000,1900,'highpass'); break;
+      case 'sfx_potion': T(t,0.19,'sine',500*f,180,0.22*rv); T(t+0.16,0.1,'sine',1200*f,1560*f,0.13*rv); break;
+      case 'sfx_bow':    T(t,0.08,'triangle',460*f,190,0.22*rv); H(t,0.11,0.16*rv,1000,2600,'bandpass',2); break;
+      case 'sfx_arrow_hit': H(t,0.045,0.28*rv,650,280,'lowpass'); T(t,0.04,'square',240*f,170,0.13*rv); break;
+      case 'sfx_gun':    H(t,0.12,0.5*rv,3400,340,'lowpass'); T(t,0.14,'sine',170*f,60,0.34*rv); break;
+      case 'sfx_bullet_hit': T(t,0.035,'square',1200*f,720,0.18*rv); H(t,0.035,0.18*rv,3400,2500,'highpass'); break;
+      case 'sfx_magic':  T(t,0.09,'sine',640*f,960*f,0.14*rv); T(t+0.05,0.09,'sine',820*f,1220*f,0.14*rv); T(t+0.1,0.11,'sine',1000*f,1480*f,0.14*rv);
+                         H(t,0.2,0.09*rv,4200,5600,'highpass'); break;
+      case 'sfx_magic_hit': T(t,0.11,'sine',960*f,400,0.22*rv); H(t,0.07,0.16*rv,1700,740,'bandpass',1.5); break;
+      case 'sfx_summon': T(t,0.5,'sine',230*f,230*f,0.15*rv); T(t,0.5,'sine',290*f,290*f,0.13*rv); T(t,0.5,'sine',345*f,345*f,0.12*rv);
+                         H(t,0.4,0.14*rv,520,2700,'bandpass',1.4); break;
+      case 'sfx_zombie': T(t,0.4,'sawtooth',120*f,64,0.19*rv); T(t,0.4,'sawtooth',124*f,66,0.15*rv); H(t,0.3,0.08*rv,420,190,'lowpass'); break;
+      case 'sfx_slime':  T(t,0.1,'sine',320*f,120,0.2*rv); H(t,0.08,0.18*rv,280,560,'lowpass'); break;
+      case 'sfx_bat':    T(t,0.045,'sine',2000*f,2600*f,0.1*rv); break;
+      case 'sfx_skeleton': T(t,0.028,'square',320,320,0.15*rv); T(t+0.045,0.028,'square',250,250,0.15*rv); T(t+0.09,0.028,'square',340,340,0.13*rv); break;
+      case 'sfx_hornet': T(t,0.22,'sawtooth',172*f,172*f,0.15*rv); T(t,0.22,'sawtooth',178*f,178*f,0.12*rv); break;
+      case 'sfx_imp':    T(t,0.09,'square',740*f,360,0.18*rv); T(t+0.1,0.08,'square',650*f,320,0.15*rv); H(t,0.18,0.07*rv,1900,950); break;
+      case 'sfx_boss_roar': T(t,0.85,'sawtooth',96*f,40,0.4*rv); T(t,0.85,'sawtooth',101*f,42,0.3*rv); T(t,0.85,'sawtooth',50*f,26,0.3*rv);
+                         H(t,0.8,0.36*rv,950,95,'lowpass'); break;
+      case 'sfx_boss_die': T(t,1.0,'sawtooth',135*f,27,0.34*rv); H(t,1.0,0.42*rv,2300,72,'lowpass'); T(t+0.15,0.5,'square',62,25,0.2*rv); break;
+      case 'sfx_splash': H(t,0.28,0.36*rv,1400*f,420,'bandpass',0.7); T(t,0.18,'sine',320*f,100,0.2*rv); break;
+      case 'sfx_lava':   H(t,0.45,0.2*rv,3800,2900,'highpass'); break;
+      case 'sfx_star':   T(t,0.06,'sine',1860,1860,0.15*rv); T(t+0.07,0.1,'sine',2217,2217,0.13*rv); break;
+      case 'sfx_click':  T(t,0.03,'square',900,900,0.13*rv); break;
+      case 'sfx_teleport': H(t,0.36,0.3*rv,340,2700,'bandpass',1.3); T(t,0.36,'sine',320*f,1400*f,0.2*rv); break;
+      case 'sfx_hit':    H(t,0.07,0.3*rv,760,210,'lowpass'); T(t,0.07,'sine',180*f,80,0.3*rv); break;
       default: return false;
     }
     return true;
@@ -3101,7 +3216,7 @@ function updatePlayer(dt){
   const headOut = !submerged(P);
   /* movement */
   let maxSpd = 6.4 * (flags.speed||1);
-  if(inWater) maxSpd *= 0.66; if(inLava) maxSpd *= 0.4; if(inHoney) maxSpd *= 0.45;
+  if(inWater) maxSpd *= flags.swim?0.95:0.66; if(inLava) maxSpd *= 0.4; if(inHoney) maxSpd *= 0.45;
   if(P.fly) maxSpd *= 2.1;
   const ax = INput.joyX;
   const accel = inWater? 26 : (inLava||inHoney? 16 : 42);
@@ -3144,7 +3259,7 @@ function updatePlayer(dt){
   }
   if(P.jumpBuf>0 && (P.coyote>0 || P.jumps>0) && !inWater && !inLava && !inHoney && !P.fly){
     if(P.coyote>0){ P.vy = -24; P.jumps = flags.djump?1:0; sfx('sfx_jump',0.5); }
-    else { P.vy = -20; P.jumps--; part(P.x, P.y-1, 0, -1, '#cfe4f4', 0.4, 4, 0); sfx('sfx_jump',0.4); }
+    else { P.vy = -20 * (flags.jumpBoost?1.15:1); P.jumps--; part(P.x, P.y-1, 0, -1, '#cfe4f4', 0.4, 4, 0); sfx('sfx_jump',0.4); }
     P.jumpBuf=0; P.coyote=0; }
   if(!INput.jump && P.vy < -8 && !inWater && !inLava && !inHoney && P.hopT<=0) P.vy = -8;
   /* fall tracking */
@@ -3166,7 +3281,7 @@ function updatePlayer(dt){
   } else if(P.vy < -1) P.stepT=1.3;   /* airborne: reset so landing never double-steps */
   if(inWater && P.vy>1.5 && G.frames%6===0) part(P.x+(Math.random()-0.5)*0.6, P.y-P.h*0.85, 0, -1.2, '#bcd8f0', 0.7, 2, 0);
   /* drowning & lava & honey */
-  if(submerged(P) && !P.god){ P.breath -= dt;
+  if(submerged(P) && !P.god){ P.breath -= dt*(flags.breath?0.4:1);
     if(P.breath<=0){ P.breath=0; P.drownT=(P.drownT||0)+dt; if(P.drownT>=1){ hurtPlayer(10,0,'drown'); P.drownT=0; } }
     if(G.frames%26===0) part(P.x, P.y-P.h*0.85, 0, -1.5, '#bcd8f0', 0.8, 2, 0); }
   else { P.breath = Math.min(10, P.breath + dt*2.5); P.drownT=0; }
@@ -3356,9 +3471,9 @@ function useAmmo(kind){ // returns {item,def} or null
   return null; }
 function fireRanged(def){
   const aim = aimPoint(); const dx = aim.x-P.x, dy = aim.y-(P.y-P.h*0.6); const d = Math.hypot(dx,dy)||1;
-  const spd = def.proj==='arrow'?22: def.proj==='bullet'?30:9;
+  const spd = def.proj==='arrow'?22: def.proj==='bullet'?30: def.proj==='snowball'?18:9;
   let am = null;
-  if(def.id!=='beeGun'){
+  if(def.id!=='beeGun' && def.proj!=='snowball'){
     am = useAmmo(def.proj==='arrow'?'arrow':'bullet');
     if(!am){ toast('Out of ammo!'); P.useCd=0.3; return; } }
   let dmg = def.dmg + (am?IT[am.id].dmg:0);
@@ -5091,6 +5206,8 @@ function drawProj(p){
     const ic = ART.icons[p.iconId]; if(ic) ctx.drawImage(ic, -0.55, -0.55, 1.1, 1.1); }
   else if(p.kind==='fireball'){ ctx.fillStyle='#ff8a2a'; ctx.beginPath(); ctx.arc(0,0,0.24,0,7); ctx.fill();
     ctx.fillStyle='#ffe080'; ctx.beginPath(); ctx.arc(-0.04,-0.04,0.12,0,7); ctx.fill(); }
+  else if(p.kind==='snowball'){ ctx.fillStyle='#eef6ff'; ctx.beginPath(); ctx.arc(0,0,0.18,0,7); ctx.fill();
+    ctx.fillStyle='#ffffff'; ctx.beginPath(); ctx.arc(-0.05,-0.05,0.08,0,7); ctx.fill(); }
   ctx.restore();
 }
 /* ================= INPUT (fixed twin-stick + free world touch) ================= */
@@ -5241,7 +5358,7 @@ function unrleB64(str, target){ const bin=atob(str); let p=0;
 function saveGame(){
   try{
     if(G.noSave) return;   /* NEW WORLD: never re-save after the save was erased */
-    const data = { v:7, t:rleB64(tiles), l:rleB64(liq), ll:rleB64(liqL), time:G.time, day:G.day,
+    const data = { v:8, t:rleB64(tiles), l:rleB64(liq), ll:rleB64(liqL), time:G.time, day:G.day,
       trees:trees.map(t=>t.alive?1:0), pots:pots.map(p=>p.alive?1:0), life:lifePickups.map(l=>l.taken?1:0),
       chests:[...chests.entries()].map(([k,c])=>[k,c.items]),
       player:{x:P.x,y:P.y,hp:P.hp,maxHp:P.maxHp,mana:P.mana,maxMana:P.maxMana,inv:P.inv,sel:P.sel,armor:P.armor,acc:P.acc,spawnX:P.spawnX,spawnY:P.spawnY,fly:P.fly||0,god:P.god||0},
@@ -5251,7 +5368,7 @@ function saveGame(){
 function loadGame(){
   try{
     const raw = localStorage.getItem(SAVE_KEY); if(!raw) return false;
-    const d = JSON.parse(raw); if(!d || d.v!==7) return false;   /* v4 world layout: fresh saves only */
+    const d = JSON.parse(raw); if(!d || d.v!==8) return false;   /* v5 world layout: fresh saves only */
     unrleB64(d.t, tiles); unrleB64(d.l, liq);
     if(d.ll){ unrleB64(d.ll, liqL); }
     else { for(let i=0;i<liq.length;i++) liqL[i] = liq[i]?LMAX:0; }
